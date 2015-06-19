@@ -31,10 +31,10 @@ end Switch_Control;
 architecture Switch_Control of Switch_Control is
 
 	
-	type state is (idle,S1,ackPulse);
+	type state is (S0,S1,S2);
 	signal currentState: state;
 	
-	signal freePorts: array1D(0 to NPORT-1);
+	signal freePorts: std_logic_vector( NPORT-1 downto 0);
 	signal routingTable: array1D_ports(0 to NPORT-1); -- routingTable(inPort)(outPort)
 	signal selectedInPort: integer range 0 to NPORT-1;
 	signal nextInPort: integer range 0 to NPORT-1;
@@ -120,19 +120,19 @@ begin
 		if rst = '1' then
             routingAck <= (others => '0');                  
             routingTable <= (others=>(others=>'0'));            
-            currentState <= idle;
+            currentState <= S0;
             
         elsif rising_edge(clk) then
             case currentState is
                 -- Takes the port selected by the PriorityEncoder function
-                when idle =>
+                when S0 =>
 					-- Select a port
 					selectedInPort <= nextInPort;
                     -- Wait for a port request.
                     if routingReq /= 0 then
                         currentState <= S1;
                     else
-                        currentState <= idle;
+                        currentState <= S0;
                     end if;                    
                     
                     -- Updates the routing table.
@@ -147,18 +147,18 @@ begin
                     if freePorts(routedOutPort) = '0' then  -- 0 = free;
                         routingTable(selectedInPort)(routedOutPort) <= '1';
                         routingAck(selectedInPort) <= '1';
-                        currentState <= ackPulse;
+                        currentState <= S2;
                     else
-                        currentState <= idle;
+                        currentState <= S0;
                     end if;
                     
                 -- Holds the routing acknowledgement active for one cycle
-                when ackPulse =>
+                when S2 =>
                     routingAck(selectedInPort) <= '0'; 
-                    currentState <= idle;
+                    currentState <= S0;
                     
                 when others =>
-                    currentState <= idle;
+                    currentState <= S0;
                 
             end case;  
         end if;

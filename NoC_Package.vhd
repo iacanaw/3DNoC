@@ -47,7 +47,6 @@ package NoC_Package is
 	-- Array used to route the gate for each node
 	type array1D_data is array (natural range <>) of std_logic_vector(DATA_WIDTH-1 downto 0);
 	type array1D_control is array (natural range <>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
-	type array1D is array (natural range<>) of std_logic;
 	type array1D_ports is array (natural range<>) of std_logic_vector(NPORT-1 downto 0);
 	
 	-- Array used to route the node (X,Y,Z)
@@ -95,13 +94,13 @@ package body NoC_Package is
 			binX := std_logic_vector(to_unsigned(x,log2(DIM_X)));
 			binY := std_logic_vector(to_unsigned(y,log2(DIM_Y)));
 			zeros2D := (others=>'0');
-			address := binX & binY & zeros2D;
+			address := zeros2D & binX & binY;
 		else  -- NoC 3D
 			binX := std_logic_vector(to_unsigned(x,log2(DIM_X)));
 			binY := std_logic_vector(to_unsigned(y,log2(DIM_Y)));
 			binZ := std_logic_vector(to_unsigned(z,log2(DIM_Z)));
 			zeros3D := (others=>'0');
-			address := binX & binY & binZ & zeros3D;
+			address := zeros3D & binX & binY & binZ;
 		end if;
 		return address;
 
@@ -111,19 +110,14 @@ package body NoC_Package is
 	function getX(address : std_logic_vector(DATA_WIDTH-1 downto 0)) return natural is
 		variable Xaddress : natural;
 	begin
-		
-		Xaddress := CONV_INTEGER(address(DATA_WIDTH-1 downto DATA_WIDTH-1-log2(DIM_X)));
-		--Xaddress := TO_INTEGER(UNSIGNED(address(DATA_WIDTH-1 downto DATA_WIDTH-1-log2(DIM_X)));
-		
+		Xaddress := TO_INTEGER(UNSIGNED(address(log2(DIM_Z)+log2(DIM_Y)+log2(DIM_X)-1 downto log2(DIM_Z)+log2(DIM_Y))));
 		return Xaddress;
 	end function getX;
 	
 	function getY(address : std_logic_vector(DATA_WIDTH-1 downto 0)) return natural is
 		variable Yaddress : natural;
 	begin
-		
-		Yaddress := CONV_INTEGER(address(DATA_WIDTH-1-log2(DIM_X)-1 downto DATA_WIDTH-1-log2(DIM_X)-1-log2(DIM_Y)));
-		
+		Yaddress := TO_INTEGER(UNSIGNED(address(log2(DIM_Y)+log2(DIM_Z)-1 downto log2(DIM_Z))));
 		return Yaddress;
 	end function getY;
 
@@ -132,7 +126,7 @@ package body NoC_Package is
 	begin
 	
 		if (DIM_Z > 1) then
-			Zaddress := CONV_INTEGER(address(DATA_WIDTH-1-log2(DIM_X)-1-log2(DIM_Y)-1 downto DATA_WIDTH-1-log2(DIM_X)-1-log2(DIM_Y)-1-log2(DIM_Z)));
+			Zaddress := TO_INTEGER(UNSIGNED(address(log2(DIM_Z)-1 downto 0)));
 		else
 			Zaddress := 0;
 		end if;
