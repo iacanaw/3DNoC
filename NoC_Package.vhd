@@ -156,15 +156,15 @@ package body NoC_Package is
 				end if;
 				
 			elsif (currentY < targetY) then
-				outputPort := SOUTH;
-			else --currentY > targetY
 				outputPort := NORTH;
+			else --currentY > targetY
+				outputPort := SOUTH;
 			end if;
 			
 		elsif (currentX < targetX) then
-			outputPort := WEST;
-		else --currentX > targetX
 			outputPort := EAST;
+		else --currentX > targetX
+			outputPort := WEST;
 		end if;
 		
 		return outputPort;
