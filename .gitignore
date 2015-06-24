@@ -2,13 +2,11 @@
 ## VHDL - QuestaSim
 #################
 
-*.tcl
 *.do
 *.wlf
 *.bak
 
 [Ww]ork/
-
 
 #################
 ## Eclipse
@@ -226,6 +224,3 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-Buffer_interconnection_TB.vhd
-Buffer_TB.vhd
-Switch_Control_tb.vhd
