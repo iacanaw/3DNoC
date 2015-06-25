@@ -135,13 +135,13 @@ package body NoC_Package is
     end function getZ;
     
     function XYZ(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer is
-        variable outputPort: integer range 0 to NPORT-1;
-        variable currentX : integer range 0 to DIM_X-1 := getX(current);
-        variable currentY : integer range 0 to DIM_Y-1 := getY(current);
-        variable currentZ : integer range 0 to DIM_Z-1 := getZ(current);
-        variable targetX : integer range 0 to DIM_X-1 := getX(target);
-        variable targetY : integer range 0 to DIM_Y-1 := getY(target);
-        variable targetZ : integer range 0 to DIM_Z-1 := getZ(target);
+        variable outputPort : integer range 0 to NPORT-1;
+        variable currentX   : integer range 0 to DIM_X-1 := getX(current);
+        variable currentY   : integer range 0 to DIM_Y-1 := getY(current);
+        variable currentZ   : integer range 0 to DIM_Z-1 := getZ(current);
+        variable targetX    : integer range 0 to DIM_X-1 := getX(target);
+        variable targetY    : integer range 0 to DIM_Y-1 := getY(target);
+        variable targetZ    : integer range 0 to DIM_Z-1 := getZ(target);
     begin
         if(currentX = targetX) then
         
