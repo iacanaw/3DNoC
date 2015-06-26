@@ -32,7 +32,7 @@ end gateBuffer;
 
 architecture behavioral of gateBuffer is
 
-    type state is (idle, txExecution);
+    type state is (IDLE, TRANSMITTING);
     signal currentState : state;
     
     -- "first" and "last" pointers are calculated based on BUFFER_DEPTH
@@ -76,33 +76,33 @@ begin
     control_out(STALL_GO) <= available_slot;
     
     -- Signal transmission to receiver
-    control_out(TX) <= '1' when currentState = txExecution and first /= last else '0';
+    control_out(TX) <= '1' when currentState = TRANSMITTING and first /= last else '0';
     
     -- Request routing for current package
-    routingRequest <= '1' when currentState = idle and last /= first else '0';
+    routingRequest <= '1' when currentState = IDLE and last /= first else '0';
     
-    sending <= '1' when currentState = txExecution else '0';
+    sending <= '1' when currentState = TRANSMITTING else '0';
     
     process(rst,clk) -- async reset
     begin
         if rst='1' then
             first <= (others=>'0');
-            currentState <= idle;
+            currentState <= IDLE;
 
         elsif rising_edge(clk) then
             case currentState is
             
                 -- Wait for the buffer to fill a slot
                 -- Request routing for current package
-                when idle =>
+                when IDLE =>
                     if routingAck = '1' then
-                        currentState <= txExecution;
+                        currentState <= TRANSMITTING;
                     else
-                        currentState <= idle;
+                        currentState <= IDLE;
                     end if;
                 
                 -- Send package flits
-                when txExecution =>
+                when TRANSMITTING =>
                 
                     -- If receiver is able and there is data to be sent, iterate pointer "first"
                     if control_in(STALL_GO)='1' and last /= first then
@@ -110,17 +110,17 @@ begin
                         
                         -- If eop_buff is logical high, end transmission
                         if eop_buff(CONV_INTEGER(first)) = '1' then
-                            currentState <= idle;
+                            currentState <= IDLE;
                         else
-                            currentState <= txExecution;
+                            currentState <= TRANSMITTING;
                         end if;
                         
                     else
-                        currentState <= txExecution;
+                        currentState <= TRANSMITTING;
                     end if;
                     
                 when others =>
-                    currentState <= idle;
+                    currentState <= IDLE;
                     
             end case;
         end if;
