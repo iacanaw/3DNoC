@@ -18,11 +18,11 @@ generic(address: std_logic_vector(DATA_WIDTH-1 downto 0));
         rst           : in std_logic;
         
         -- Data and control inputs
-        data_in       : in array1D_data(0 to 6);
-        control_in    : in array1D_control(0 to 6);
+        data_in       : in array1D_data(0 to NPORT-1);
+        control_in    : in array1D_control(0 to NPORT-1);
         -- Data and control outputs
-        data_out      : out array1D_data(0 to 6);
-        control_out   : out array1D_control(0 to 6)
+        data_out      : out array1D_data(0 to NPORT-1);
+        control_out   : out array1D_control(0 to NPORT-1)
     );
 end Router;
 
