@@ -10,13 +10,12 @@
 library ieee;
 use ieee.std_Logic_1164.all;
 use ieee.numeric_std.all; -- Used in getAddress() function
-use ieee.std_logic_unsigned.all; -- Used in getX,Y,Z() functions
 
 package NoC_Package is
 
     -- Constants
     
-    -- Dimension X and Y need to be greater than 1, for two-dimensional NoCs use Z = 1
+    -- Dimension X and Y need to be greater than 1, for 2D NoCs use Z = 1
     -- X grows from left to right, Y grows from front to back, Z grows from bottom to top
     constant DIM_X    : integer := 9;
     constant DIM_Y    : integer := 10;
@@ -44,16 +43,19 @@ package NoC_Package is
     
     -- Types of arrays
     
-    -- Array used to route the gate for each node
+    -- Types used at Router and SwitchControl interface.
+    -- Each element indicates a port (LOCAL, EAST, WEST, NORTH, SOUTH, UP or DOWN).
     type array1D_data is array (natural range <>) of std_logic_vector(DATA_WIDTH-1 downto 0);
     type array1D_control is array (natural range <>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
     type array1D_ports is array (natural range<>) of std_logic_vector(NPORT-1 downto 0);
     
-    -- Array used to route the node (X,Y,Z)
+    -- Types used at NoC interface. 
+    -- In case of 3D NoCs, each element (x,y,z) indicates a router local port. 
+    -- In case of 2D NoCs z=1. Each element (x,y,1) indicates a router local port. 
     type array3D_data is array (natural range <>, natural range <>, natural range<>) of std_logic_vector(DATA_WIDTH-1 downto 0);
     type array3D_control is array (natural range <>, natural range <>, natural range<>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
     
-    -- Array used to route the node and node gate  (X,Y,Z,Gate)
+    -- Types used to interconnect routers when generating a NoC instance (NoC.vhd).
     type array4D_data is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(DATA_WIDTH-1 downto 0);
     type array4D_control is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
 
