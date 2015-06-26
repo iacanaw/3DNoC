@@ -29,8 +29,7 @@ entity Switch_Control is
 end Switch_Control;
 
 architecture Switch_Control of Switch_Control is
-
-    
+   
     type state is (IDLE,SET_ROUTING_TABLE,ROUTING_ACK);
     signal currentState: state;
     
@@ -42,6 +41,9 @@ architecture Switch_Control of Switch_Control is
     signal routedOutPort: integer range 0 to NPORT-1;
 begin
     
+    -------------------------------------------------------------
+    -- Round robin policy to chose the input port to be served --
+    -------------------------------------------------------------
     process(selectedInPort,routingReq)
     begin
         case selectedInPort is
@@ -115,6 +117,9 @@ begin
     
     routedOutPort <= XYZ(data(selectedInPort),address);
     
+    ------------------------------
+    -- Routing table management --
+    ------------------------------
     process(clk, rst)
     begin
         if rst = '1' then
@@ -124,10 +129,10 @@ begin
             
         elsif rising_edge(clk) then
             case currentState is
-                -- Takes the port selected by the PriorityEncoder function
+                -- Takes the port selected by the round robin
                 when IDLE =>
-                    -- Select a port
                     selectedInPort <= nextInPort;
+                    
                     -- Wait for a port request.
                     if SIGNED(routingReq) /= 0 then
                         currentState <= SET_ROUTING_TABLE;
@@ -136,6 +141,7 @@ begin
                     end if;                    
                     
                     -- Updates the routing table.
+                    -- Frees the output ports released by the input ones 
                     for i in 0 to NPORT-1 loop
                         if sending(i) = '0' then
                             routingTable(i) <= (others=>'0');
@@ -167,6 +173,7 @@ begin
     
     table <= routingTable;
     
+    -- Update the current free output ports
     FREE_PORTS: for i in 0 to NPORT-1 generate
         freePorts(i) <= (routingTable(LOCAL)(i)) or (routingTable(EAST)(i)) or (routingTable(SOUTH)(i)) or (routingTable(WEST)(i)) or (routingTable(NORTH)(i)) or (routingTable(UP)(i)) or (routingTable(DOWN)(i));
     end generate;
