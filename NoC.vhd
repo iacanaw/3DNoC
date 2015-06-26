@@ -54,11 +54,11 @@ begin
     control_dump <= (others => '0');
     
     assert (DIM_X > 1)
-    report "DIM_X in NoC_Package needs to be greater than one"
+    report "DIM_X in NoC_Package must be greater than one"
     severity FAILURE;
     
     assert (DIM_Y > 1)
-    report "DIM_Y in NoC_Package needs to be greater than one"
+    report "DIM_Y in NoC_Package must be greater than one"
     severity FAILURE;
     
     -- Loop to generate a 2D NoC
