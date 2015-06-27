@@ -8,7 +8,7 @@
 --              : Version 0.2 - May 17th, 2015 - Adição do loop para geração da NOC --
 -- bidimensional                                                                    --
 --------------------------------------------------------------------------------------
--- TEMP SECTIONS ARE INCOMPLETE
+
 library ieee;
 use ieee.std_logic_1164.all;
 use work.NoC_Package.all;
@@ -18,11 +18,11 @@ entity NOC is
         clk            : in std_logic;
         rst            : in std_logic;
         
-        -- LOCAL input and output gate for each node
-        data_in        : in array3D_data(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1);
-        data_out       : out array3D_data(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1);
-        control_in     : in array3D_control(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1);
-        control_out    : out array3D_control(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1)
+        -- LOCAL input and output port for each node
+        data_in        : in Array3D_data(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1);
+        data_out       : out Array3D_data(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1);
+        control_in     : in Array3D_control(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1);
+        control_out    : out Array3D_control(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1)
     );
 end NOC;
 
@@ -34,18 +34,18 @@ architecture structural of NOC is
         port(
             clk            : in std_logic;
             rst            : in std_logic;
-            data_in        : in array1D_data(0 to 6);
-            control_in     : in array1D_control(0 to 6);
-            data_out       : out array1D_data(0 to 6);
-            control_out    : out array1D_control(0 to 6)
+            data_in        : in Array1D_data(0 to 6);
+            control_in     : in Array1D_control(0 to 6);
+            data_out       : out Array1D_data(0 to 6);
+            control_out    : out Array1D_control(0 to 6)
         );
     end component;
     
     -- Connections between routers inputs/outputs
-    signal data : array4D_data(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1, 0 to 6);
+    signal data : Array4D_data(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1, 0 to 6);
     signal control : array4D_control(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1, 0 to 6);
     
-    -- Signals for unused gates
+    -- Signals for unused ports
     signal data_dump : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal control_dump : std_logic_vector(CONTROL_WIDTH-1 downto 0);
     
@@ -68,7 +68,7 @@ begin
                 X_LOOPER: for x in 0 to (DIM_X-1) generate
                     CENTRAL_ROUTER: if ((x-1>=0) AND (x+1<DIM_X) AND (y-1>=0) AND (y+1<DIM_Y)) generate
                         ROUT: Router 
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -103,9 +103,9 @@ begin
                         );
                     end generate CENTRAL_ROUTER;
                     
-                    LEFT_FRONT_CORNER: if ((x=0) AND (y=0)) generate
+                    BOTTON_LEFT_CORNER: if ((x=0) AND (y=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -138,11 +138,11 @@ begin
                             control_out(UP)     => control(x,y,z,UP),
                             control_out(DOWN)   => control(x,y,z,DOWN)
                         );
-                    end generate LEFT_FRONT_CORNER;
+                    end generate BOTTON_LEFT_CORNER;
                     
-                    RIGHT_FRONT_CORNER: if ((x=DIM_X-1) AND (y=0)) generate
+                    BOTTON_RIGHT_CORNER: if ((x=DIM_X-1) AND (y=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -175,11 +175,11 @@ begin
                             control_out(UP)     => control(x,y,z,UP),
                             control_out(DOWN)   => control(x,y,z,DOWN)
                         );
-                    end generate RIGHT_FRONT_CORNER;
+                    end generate BOTTON_RIGHT_CORNER;
                     
-                    LEFT_BACK_CORNER: if ((x=0) AND (y=DIM_Y-1)) generate
+                    TOP_LEFT_CORNER: if ((x=0) AND (y=DIM_Y-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -212,11 +212,11 @@ begin
                             control_out(UP)     => control(x,y,z,UP),
                             control_out(DOWN)   => control(x,y,z,DOWN)
                         );
-                    end generate LEFT_BACK_CORNER;
+                    end generate TOP_LEFT_CORNER;
                     
-                    RIGHT_BACK_CORNER: if ((x=DIM_X-1) AND (y=DIM_Y-1)) generate
+                    TOP_RIGHT_CORNER: if ((x=DIM_X-1) AND (y=DIM_Y-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -249,11 +249,11 @@ begin
                             control_out(UP)     => control(x,y,z,UP),
                             control_out(DOWN)   => control(x,y,z,DOWN)
                         );
-                    end generate RIGHT_BACK_CORNER;
+                    end generate TOP_RIGHT_CORNER;
                     
-                    FRONT_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=0)) generate
+                    BOTTON_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -286,11 +286,11 @@ begin
                             control_out(UP)     => control(x,y,z,UP),
                             control_out(DOWN)   => control(x,y,z,DOWN)
                         );
-                    end generate FRONT_BORDER;
+                    end generate BOTTON_BORDER;
                     
                     LEFT_BORDER: if ((x=0) AND (y>0) AND (y<DIM_Y-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -325,9 +325,9 @@ begin
                         );
                     end generate LEFT_BORDER;
                     
-                    BACK_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=DIM_Y-1)) generate
+                    TOP_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=DIM_Y-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -360,11 +360,11 @@ begin
                             control_out(UP)     => control(x,y,z,UP),
                             control_out(DOWN)   => control(x,y,z,DOWN)
                         );
-                    end generate BACK_BORDER;
+                    end generate TOP_BORDER;
                     
                     RIGHT_BORDER: if ((x=DIM_X-1) AND (y>0) AND (y<DIM_Y-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -416,7 +416,7 @@ begin
                     -- Nodes connections according to their position inside the cube-shaped NoC            
                     CENTRAL_ROUTER: if ((x-1>=0) AND (x+1<DIM_X) AND (y-1>=0) AND (y+1<DIM_Y) AND (z-1>=0) AND (z+1<DIM_Z)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -453,7 +453,7 @@ begin
                     
                     LEFT_FRONT_BOTTOM_CORNER: if ((x=0) AND (y=0) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -491,7 +491,7 @@ begin
                     
                     RIGHT_FRONT_BOTTOM_CORNER: if ((x=DIM_X-1) AND (y=0) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -528,7 +528,7 @@ begin
                     
                     LEFT_BACK_BOTTOM_CORNER: if ((x=0) AND (y=DIM_Y-1) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -565,7 +565,7 @@ begin
                     
                     RIGHT_BACK_BOTTOM_CORNER: if ((x=DIM_X-1) AND (y=DIM_Y-1) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -602,7 +602,7 @@ begin
                     
                     LEFT_FRONT_TOP_CORNER: if ((x=0) AND (y=0) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -639,7 +639,7 @@ begin
                     
                     RIGHT_FRONT_TOP_CORNER: if ((x=DIM_X-1) AND (y=0) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -676,7 +676,7 @@ begin
                     
                     LEFT_BACK_TOP_CORNER: if ((x=0) AND (y=DIM_Y-1) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -713,7 +713,7 @@ begin
                     
                     RIGHT_BACK_TOP_CORNER: if ((x=DIM_X-1) AND (y=DIM_Y-1) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -750,7 +750,7 @@ begin
                     
                     FRONT_BOTTOM_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=0) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -787,7 +787,7 @@ begin
                     
                     LEFT_BOTTOM_BORDER: if ((x=0) AND (y>0) AND (y<DIM_Y-1) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -824,7 +824,7 @@ begin
                     
                     BACK_BOTTOM_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=DIM_Y-1) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -861,7 +861,7 @@ begin
                     
                     RIGHT_BOTTOM_BORDER: if ((x=DIM_X-1) AND (y>0) AND (y<DIM_Y-1) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -898,7 +898,7 @@ begin
                     
                     FRONT_TOP_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=0) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -935,7 +935,7 @@ begin
                     
                     LEFT_TOP_BORDER: if ((x=0) AND (y>0) AND (y<DIM_Y-1) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -972,7 +972,7 @@ begin
                     
                     BACK_TOP_BORDER: if ((x>0) AND (x<DIM_X-1) AND (y=DIM_Y-1) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1009,7 +1009,7 @@ begin
                     
                     RIGHT_TOP_BORDER: if ((x=DIM_X-1) AND (y>0) AND (y<DIM_Y-1) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1046,7 +1046,7 @@ begin
                     
                     LEFT_FRONT_BORDER: if ((x=0) AND (y=0) AND (z>0) AND (z<DIM_Z-1)) generate
                         gROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1083,7 +1083,7 @@ begin
                     
                     RIGHT_FRONT_BORDER: if ((x=DIM_X-1) AND (y=0) AND (z>0) AND (z<DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1120,7 +1120,7 @@ begin
                     
                     LEFT_BACK_BORDER: if ((x=0) AND (y=DIM_Y-1) AND (z>0) AND (z<DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1157,7 +1157,7 @@ begin
                     
                     RIGHT_BACK_BORDER: if ((x=DIM_X-1) AND (y=DIM_Y-1) AND (z>0) AND (z<DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1194,7 +1194,7 @@ begin
                     
                     FRONT_FACE: if ((x>0) AND (x<DIM_X-1) AND (y=0) AND (z>0) AND (z<DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1231,7 +1231,7 @@ begin
                     
                     LEFT_FACE: if ((x=0) AND (y>0) AND (y<DIM_Y-1) AND (z>0) AND (z<DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1268,7 +1268,7 @@ begin
                     
                     RIGHT_FACE: if ((x>0) AND (x<DIM_X-1) AND (y=DIM_Y-1) AND (z>0) AND (z<DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1305,7 +1305,7 @@ begin
                     
                     BACK_FACE: if ((x=DIM_X-1) AND (y>0) AND (y<DIM_Y-1) AND (z>0) AND (z<DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1342,7 +1342,7 @@ begin
                     
                     BOTTOM_FACE: if ((x>0) AND (x<DIM_X-1) AND (y>0) AND (y<DIM_Y-1) AND (z=0)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,
@@ -1379,7 +1379,7 @@ begin
                     
                     TOP_FACE: if ((x>0) AND (x<DIM_X-1) AND (y>0) AND (y<DIM_Y-1) AND (z=DIM_Z-1)) generate
                         ROUT: Router
-                            generic map(address => getAddress(x,y,z))
+                            generic map(address => Address(x,y,z))
                             port map(
                             clk                 => clk,
                             rst                 => rst,

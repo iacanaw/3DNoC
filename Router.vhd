@@ -6,7 +6,7 @@
 -- VERSION      : 0.1                                                               --
 -- HISTORY      : Version 0.1 - Apr 8th, 2015                                       --
 --------------------------------------------------------------------------------------
--- TEMP SECTIONS ARE INCOMPLETE
+
 library ieee;
 use ieee.std_logic_1164.all;
 use work.NoC_Package.all;
@@ -18,11 +18,11 @@ generic(address: std_logic_vector(DATA_WIDTH-1 downto 0));
         rst           : in std_logic;
         
         -- Data and control inputs
-        data_in       : in array1D_data(0 to NPORT-1);
-        control_in    : in array1D_control(0 to NPORT-1);
+        data_in       : in Array1D_data(0 to PORTS-1);
+        control_in    : in Array1D_control(0 to PORTS-1);
         -- Data and control outputs
-        data_out      : out array1D_data(0 to NPORT-1);
-        control_out   : out array1D_control(0 to NPORT-1)
+        data_out      : out Array1D_data(0 to PORTS-1);
+        control_out   : out Array1D_control(0 to PORTS-1)
     );
 end Router;
 
@@ -31,7 +31,6 @@ architecture Router of Router is
 
 begin
     
-    -- TEMP
     -- Direct routing for test
     data_out(EAST)  <= data_in(WEST);
     data_out(WEST)  <= data_in(EAST);

@@ -10,13 +10,13 @@ if { ![file exist work] } {
 set sourceFiles {
     ../NoC_Package.vhd
     ../Buffer.vhd
-    ../Switch_Control.vhd
+    ../SwitchControl.vhd
     ../Router.vhd
     ../NoC.vhd
-    Switch_Control_tb.vhd
+    SwitchControl_tb.vhd
     }
 
-set top Switch_Control_tb
+set top SwitchControl_tb
 
 if { [llength $sourceFiles] > 0 } {
     

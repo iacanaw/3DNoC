@@ -1,18 +1,18 @@
 --------------------------------------------------------------------------------------
--- DESIGN UNIT  : Gate Buffer                                                       --
+-- DESIGN UNIT  : Buffer                                                       --
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 8th, 2015                                                     --
 -- VERSION      : 0.1                                                               --
 -- HISTORY      : Version 0.1 - May 13th, 2015                                      --
 --------------------------------------------------------------------------------------
--- TEMP SECTIONS ARE INCOMPLETE
+
 library ieee;
 use ieee.std_logic_1164.all;
 use work.NoC_Package.all;
 use IEEE.std_logic_arith.all;
 
-entity gateBuffer is
+entity portBuffer is
     port(
         clk             : in    std_logic;
         rst             : in    std_logic;
@@ -28,9 +28,9 @@ entity gateBuffer is
         routingAck      : in  std_logic;
         sending         : out std_logic
     );
-end gateBuffer;
+end portBuffer;
 
-architecture behavioral of gateBuffer is
+architecture behavioral of portBuffer is
 
     type state is (IDLE, TRANSMITTING);
     signal currentState : state;
@@ -42,7 +42,7 @@ architecture behavioral of gateBuffer is
     signal data_read        : std_logic_vector(DATA_WIDTH-1 downto 0);
     
     -- Buffer works in a circular queue - first in first out
-    signal queue            : data_buff;
+    signal queue            : DataBuff;
     -- EOP signal is declared here to allow the use of eop_buff <= (others=>'0')) 
     signal eop_buff            : std_logic_vector(BUFFER_DEPTH-1 downto 0);
 
@@ -117,7 +117,7 @@ begin
                     if control_in(STALL_GO)='1' and last /= first then
                         first <= first + 1;
                         
-                        -- If the last packet flit was tranmitted, finish the transmission
+                        -- If the last packet flit was transmitted, finish the transmission
                         if eop_buff(CONV_INTEGER(first)) = '1' then
                             currentState <= IDLE;
                         else
