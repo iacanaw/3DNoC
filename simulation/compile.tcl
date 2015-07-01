@@ -39,8 +39,8 @@ if { [llength $sourceFiles] > 0 } {
 
 puts "\n*** Compilation OK ;) ***"
 
-vsim $top
+#vsim $top
 
 # Wave.do
-do sc_wave.do
-run 500ns
+#do sc_wave.do
+#run 500ns

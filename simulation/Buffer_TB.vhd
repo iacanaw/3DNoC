@@ -75,7 +75,7 @@ begin
 		
 	end process;
 	
-	BUFFER_0: entity work.gateBuffer 
+	BUFFER_0: entity work.InputBuffer 
 		port map (
 			clk				=> clk,
 			rst				=> rst,

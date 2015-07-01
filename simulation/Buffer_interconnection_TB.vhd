@@ -103,7 +103,7 @@ begin
 
 	end process;
 	
-	BUFFER_0: entity work.gateBuffer 
+	BUFFER_0: entity work.InputBuffer 
 		port map (
 			clk				=> clk,
 			rst				=> rst,
@@ -123,7 +123,7 @@ begin
 			routingAck		=> routingAck0
 		);
 		
-	BUFFER_1: entity work.gateBuffer 
+	BUFFER_1: entity work.InputBuffer 
 		port map (
 			clk				=> clk,
 			rst				=> rst,

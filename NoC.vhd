@@ -5,7 +5,7 @@
 -- CREATED      : Apr 12th, 2015                                                    --
 -- VERSION      : 0.1                                                               --
 -- HISTORY      : Version 0.1 - Apr 12th, 2015                                      --
---              : Version 0.2 - May 17th, 2015 - Adição do loop para geração da NOC --
+--              : Version 0.2 - May 17th, 2015 - Adição do loop para geração da NoC --
 -- bidimensional                                                                    --
 --------------------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use work.NoC_Package.all;
 
-entity NOC is
+entity NoC is
     port(
         clk            : in std_logic;
         rst            : in std_logic;
@@ -24,9 +24,9 @@ entity NOC is
         control_in     : in Array3D_control(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1);
         control_out    : out Array3D_control(0 to DIM_X-1, 0 to DIM_Y-1, 0 to DIM_Z-1)
     );
-end NOC;
+end NoC;
 
-architecture structural of NOC is
+architecture structural of NoC is
     
     -- Router component declaration
     component Router is
@@ -62,7 +62,7 @@ begin
     severity FAILURE;
     
     -- Loop to generate a 2D NoC
-    NOC_2D: if (DIM_X>1 AND DIM_Y>1 AND DIM_Z=1) generate
+    NoC_2D: if (DIM_X>1 AND DIM_Y>1 AND DIM_Z=1) generate
         Z_LOOPER: for z in 0 to (DIM_Z-1) generate
             Y_LOOPER: for y in 0 to (DIM_Y-1) generate
                 X_LOOPER: for x in 0 to (DIM_X-1) generate
@@ -402,13 +402,13 @@ begin
                 end generate X_LOOPER;
             end generate Y_LOOPER;
         end generate Z_LOOPER;
-    end generate NOC_2D;
+    end generate NoC_2D;
     
     
     
     
     -- Loop to generate a 3D NoC
-    NOC_3D: if (DIM_X>1 AND DIM_Y>1 AND DIM_Z>1) generate
+    NoC_3D: if (DIM_X>1 AND DIM_Y>1 AND DIM_Z>1) generate
         Z_LOOPER: for z in 0 to (DIM_Z-1) generate
             Y_LOOPER: for y in 0 to (DIM_Y-1) generate
                 X_LOOPER: for x in 0 to (DIM_X-1) generate
@@ -1417,5 +1417,5 @@ begin
                 end generate X_LOOPER;
             end generate Y_LOOPER;
         end generate Z_LOOPER;
-    end generate NOC_3D;
+    end generate NoC_3D;
 end structural;

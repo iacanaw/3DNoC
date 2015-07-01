@@ -8,9 +8,10 @@ if { ![file exist work] } {
 
 # Source files listed in hierarchical order: bottom -> top
 set sourceFiles {
-	NoC/NoC_Package.vhd
-	NoC/Buffer.vhd
-	NoC/Buffer_interconnection_TB.vhd
+	../NoC_Package.vhd
+	../InputBuffer.vhd
+	Buffer_interconnection_TB.vhd
+    Buffer_TB.vhd
 	}
 #NoC/Buffer_TB.vhd
 

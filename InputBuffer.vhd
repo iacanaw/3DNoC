@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------
--- DESIGN UNIT  : Buffer                                                       --
+-- DESIGN UNIT  : InputBuffer                                                       --
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 8th, 2015                                                     --
@@ -12,7 +12,7 @@ use ieee.std_logic_1164.all;
 use work.NoC_Package.all;
 use IEEE.std_logic_arith.all;
 
-entity portBuffer is
+entity InputBuffer is
     port(
         clk             : in    std_logic;
         rst             : in    std_logic;
@@ -28,9 +28,9 @@ entity portBuffer is
         routingAck      : in  std_logic;
         sending         : out std_logic
     );
-end portBuffer;
+end InputBuffer;
 
-architecture behavioral of portBuffer is
+architecture behavioral of InputBuffer is
 
     type state is (IDLE, TRANSMITTING);
     signal currentState : state;
