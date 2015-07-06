@@ -9,14 +9,14 @@ if { ![file exist work] } {
 # Source files listed in hierarchical order: bottom -> top
 set sourceFiles {
     ../NoC_Package.vhd
-    ../Buffer.vhd
+    ../InputBuffer.vhd
     ../SwitchControl.vhd
+    ../Crossbar.vhd
     ../Router.vhd
     ../NoC.vhd
-    SwitchControl_tb.vhd
     }
 
-set top SwitchControl_tb
+set top Crossbar
 
 if { [llength $sourceFiles] > 0 } {
     
