@@ -89,6 +89,39 @@ begin
                      control_in(LOCAL)(STALL_GO) when table(EAST)(LOCAL) = '1' else
                      '0';
 --------------------------------------------------------------------------------------
+-- SOUTH PORT
+--------------------------------------------------------------------------------------
+    data_out(SOUTH) <= data_in(WEST) when table(WEST)(SOUTH) = '1' else
+                     data_in(NORTH) when table(NORTH)(SOUTH) = '1' else
+                     data_in(UP) when table(UP)(SOUTH) = '1' else
+                     data_in(DOWN) when table(DOWN)(SOUTH) = '1' else
+                     data_in(LOCAL) when table(LOCAL)(SOUTH) = '1' else
+                     data_in(EAST); --when table(EAST)(SOUTH) = '1'
+                    
+    control_out(SOUTH)(EOP) <= control_in(WEST)(EOP) when table(WEST)(SOUTH) = '1' else
+                     control_in(NORTH)(EOP) when table(NORTH)(SOUTH) = '1' else
+                     control_in(UP)(EOP) when table(UP)(SOUTH) = '1' else
+                     control_in(DOWN)(EOP) when table(DOWN)(SOUTH) = '1' else
+                     control_in(LOCAL)(EOP) when table(LOCAL)(SOUTH) = '1' else
+                     control_in(EAST)(EOP) when table(EAST)(SOUTH) = '1' else
+                     '0';
+    
+    control_out(SOUTH)(RX) <= control_in(WEST)(TX) when table(WEST)(SOUTH) = '1' else
+                     control_in(NORTH)(TX) when table(NORTH)(SOUTH) = '1' else
+                     control_in(UP)(TX) when table(UP)(SOUTH) = '1' else
+                     control_in(DOWN)(TX) when table(DOWN)(SOUTH) = '1' else
+                     control_in(LOCAL)(TX) when table(LOCAL)(SOUTH) = '1' else
+                     control_in(EAST)(TX) when table(EAST)(SOUTH) = '1' else
+                     '0';
+    
+    control_out(SOUTH)(STALL_GO) <= control_in(WEST)(STALL_GO) when table(SOUTH)(WEST) = '1' else
+                     control_in(NORTH)(STALL_GO) when table(SOUTH)(NORTH) = '1' else
+                     control_in(UP)(STALL_GO) when table(SOUTH)(UP) = '1' else
+                     control_in(DOWN)(STALL_GO) when table(SOUTH)(DOWN) = '1' else
+                     control_in(LOCAL)(STALL_GO) when table(SOUTH)(LOCAL) = '1' else
+                     control_in(EAST)(STALL_GO) when table(SOUTH)(EAST) = '1' else
+                     '0';      
+--------------------------------------------------------------------------------------
 -- WEST PORT
 --------------------------------------------------------------------------------------
     data_out(WEST) <= data_in(NORTH) when table(NORTH)(WEST) = '1' else

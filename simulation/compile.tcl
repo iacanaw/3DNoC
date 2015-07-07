@@ -14,9 +14,10 @@ set sourceFiles {
     ../Crossbar.vhd
     ../Router.vhd
     ../NoC.vhd
+    Crossbar_tb.vhd
     }
 
-set top Crossbar
+set top Crossbar_tb
 
 if { [llength $sourceFiles] > 0 } {
     
@@ -39,8 +40,13 @@ if { [llength $sourceFiles] > 0 } {
 
 puts "\n*** Compilation OK ;) ***"
 
+# Start simulation
 #vsim $top
 
-# Wave.do
+# Crossbar_tb wave
+#cb_wave.do
+#run 150ns
+
+# SwitchControl_tb wave
 #do sc_wave.do
 #run 500ns
