@@ -14,10 +14,9 @@ set sourceFiles {
     ../Crossbar.vhd
     ../Router.vhd
     ../NoC.vhd
-    Crossbar_tb.vhd
     }
 
-set top Crossbar_tb
+set top NoC.vhd
 
 if { [llength $sourceFiles] > 0 } {
     
