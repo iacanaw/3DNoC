@@ -175,5 +175,5 @@ package body NoC_Package is
         return outputPort;
         
     end XYZ;
-    
+
 end NoC_Package;

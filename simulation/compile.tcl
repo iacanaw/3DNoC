@@ -14,9 +14,11 @@ set sourceFiles {
     ../Crossbar.vhd
     ../Router.vhd
     ../NoC.vhd
+    Text_Package.vhd
+    DataManager.vhd
     }
 
-set top NoC.vhd
+set top DataManager.vhd
 
 if { [llength $sourceFiles] > 0 } {
     
@@ -44,7 +46,7 @@ puts "\n*** Compilation OK ;) ***"
 
 # Crossbar_tb wave
 #cb_wave.do
-#run 150ns
+#run 150 ns
 
 # SwitchControl_tb wave
 #do sc_wave.do
