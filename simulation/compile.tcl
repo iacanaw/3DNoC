@@ -16,9 +16,10 @@ set sourceFiles {
     ../NoC.vhd
     Text_Package.vhd
     DataManager.vhd
+    TopNoC.vhd
     }
 
-set top DataManager.vhd
+set top TopNoC.vhd
 
 if { [llength $sourceFiles] > 0 } {
     
@@ -42,7 +43,7 @@ if { [llength $sourceFiles] > 0 } {
 puts "\n*** Compilation OK ;) ***"
 
 # Start simulation
-#vsim $top
+vsim $top
 
 # Crossbar_tb wave
 #cb_wave.do
