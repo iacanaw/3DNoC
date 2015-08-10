@@ -20,11 +20,11 @@ entity SwitchControl is
         clk         :    in    std_logic;
         rst         :    in    std_logic;
         
-        routingReq  :    in  std_logic_vector( PORTS-1 downto 0);
-        routingAck  :    out std_logic_vector( PORTS-1 downto 0);
-        data        :    in  Array1D_data(0 to PORTS-1);
-        sending     :    in  std_logic_vector( PORTS-1 downto 0);    
-        table       :    out Array1D_ports(0 to PORTS-1)
+        routingReq  :    in  std_logic_vector(PORTS-1 downto 0);    -- Routing request from input buffers
+        routingAck  :    out std_logic_vector(PORTS-1 downto 0);    -- Routing acknowledgement to input buffers
+        data        :    in  Array1D_data(0 to PORTS-1);    -- Each array element corresponds to a input buffer data_out
+        sending     :    in  std_logic_vector(PORTS-1 downto 0);  -- Each array element signals an input buffer transmiting data
+        table       :    out Array1D_ports(0 to PORTS-1)    -- Routing table to be connected to crossbar
     );
 end SwitchControl;
 
@@ -33,12 +33,12 @@ architecture behavioral of SwitchControl is
     type state is (IDLE,SET_ROUTING_TABLE,ROUTING_ACK);
     signal currentState: state;
     
-    signal freePorts: std_logic_vector( PORTS-1 downto 0);
-    signal routingTable: Array1D_ports(0 to PORTS-1); -- routingTable(iPORTS)(outPort)
-    signal selectedInPort: integer range 0 to PORTS-1;
-    signal nextIPORTS: integer range 0 to PORTS-1;
+    signal freePorts: std_logic_vector(PORTS-1 downto 0);   -- Status of all output ports (0 = free; 1 = busy)
+    signal routingTable: Array1D_ports(0 to PORTS-1); -- routingTable(inPort)(outPort)
+    signal selectedInPort: integer range 0 to PORTS-1;  -- Input port selected to routing
+    signal nextInPort: integer range 0 to PORTS-1;  -- Next input port to be selected to routing
+    signal routedOutPort: integer range 0 to PORTS-1;   -- Output port selected by the routing algorithm
     
-    signal routedOutPort: integer range 0 to PORTS-1;
 begin
     
     -------------------------------------------------------------
@@ -48,73 +48,74 @@ begin
     begin
         case selectedInPort is
             when LOCAL =>
-                if routingReq(EAST) = '1'       then nextIPORTS <= EAST;
-                elsif routingReq(SOUTH) = '1'   then nextIPORTS <= SOUTH;
-                elsif routingReq(WEST) = '1'    then nextIPORTS <= WEST;
-                elsif routingReq(NORTH) = '1'   then nextIPORTS <= NORTH;
-                elsif routingReq(UP) = '1'      then nextIPORTS <= UP;
-                elsif routingReq(DOWN) = '1'    then nextIPORTS <= DOWN;
-                else nextIPORTS <= LOCAL;
+                if routingReq(EAST) = '1'       then nextInPort <= EAST;
+                elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
+                elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
+                elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
+                elsif routingReq(UP) = '1'      then nextInPort <= UP;
+                elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
+                else nextInPort <= LOCAL;
                 end if;
             when EAST =>
-                if routingReq(SOUTH) = '1'      then nextIPORTS <= SOUTH;
-                elsif routingReq(WEST) = '1'    then nextIPORTS <= WEST;
-                elsif routingReq(NORTH) = '1'   then nextIPORTS <= NORTH;
-                elsif routingReq(UP) = '1'      then nextIPORTS <= UP;
-                elsif routingReq(DOWN) = '1'    then nextIPORTS <= DOWN;
-                elsif routingReq(LOCAL) = '1'   then nextIPORTS <= LOCAL;
-                else nextIPORTS <= EAST;
+                if routingReq(SOUTH) = '1'      then nextInPort <= SOUTH;
+                elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
+                elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
+                elsif routingReq(UP) = '1'      then nextInPort <= UP;
+                elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
+                elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
+                else nextInPort <= EAST;
                 end if;
             when SOUTH =>
-                if routingReq(WEST) = '1'       then nextIPORTS <= WEST;
-                elsif routingReq(NORTH) = '1'   then nextIPORTS <= NORTH;
-                elsif routingReq(UP) = '1'      then nextIPORTS <= UP;
-                elsif routingReq(DOWN) = '1'    then nextIPORTS <= DOWN;
-                elsif routingReq(LOCAL) = '1'   then nextIPORTS <= LOCAL;
-                elsif routingReq(EAST) = '1'    then nextIPORTS <= EAST;
-                else nextIPORTS <= SOUTH;
+                if routingReq(WEST) = '1'       then nextInPort <= WEST;
+                elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
+                elsif routingReq(UP) = '1'      then nextInPort <= UP;
+                elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
+                elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
+                elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
+                else nextInPort <= SOUTH;
                 end if;
             when WEST =>
-                if routingReq(NORTH) = '1'      then nextIPORTS <= NORTH;
-                elsif routingReq(UP) = '1'      then nextIPORTS <= UP;
-                elsif routingReq(DOWN) = '1'    then nextIPORTS <= DOWN;
-                elsif routingReq(LOCAL) = '1'   then nextIPORTS <= LOCAL;
-                elsif routingReq(EAST) = '1'    then nextIPORTS <= EAST;
-                elsif routingReq(SOUTH) = '1'   then nextIPORTS <= SOUTH;
-                else nextIPORTS <= WEST;
+                if routingReq(NORTH) = '1'      then nextInPort <= NORTH;
+                elsif routingReq(UP) = '1'      then nextInPort <= UP;
+                elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
+                elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
+                elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
+                elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
+                else nextInPort <= WEST;
                 end if;
             when NORTH =>
-                if routingReq(UP) = '1'         then nextIPORTS <= UP;
-                elsif routingReq(DOWN) = '1'    then nextIPORTS <= DOWN;
-                elsif routingReq(LOCAL) = '1'   then nextIPORTS <= LOCAL;
-                elsif routingReq(EAST) = '1'    then nextIPORTS <= EAST;
-                elsif routingReq(SOUTH) = '1'   then nextIPORTS <= SOUTH;
-                elsif routingReq(WEST) = '1'    then nextIPORTS <= WEST;
-                else nextIPORTS <= NORTH;
+                if routingReq(UP) = '1'         then nextInPort <= UP;
+                elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
+                elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
+                elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
+                elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
+                elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
+                else nextInPort <= NORTH;
                 end if;
             when UP =>
-                if routingReq(DOWN) = '1'       then nextIPORTS <= DOWN;
-                elsif routingReq(LOCAL) = '1'   then nextIPORTS <= LOCAL;
-                elsif routingReq(EAST) = '1'    then nextIPORTS <= EAST;
-                elsif routingReq(SOUTH) = '1'   then nextIPORTS <= SOUTH;
-                elsif routingReq(WEST) = '1'    then nextIPORTS <= WEST;
-                elsif routingReq(NORTH) = '1'   then nextIPORTS <= NORTH;
-                else nextIPORTS <= UP;
+                if routingReq(DOWN) = '1'       then nextInPort <= DOWN;
+                elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
+                elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
+                elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
+                elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
+                elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
+                else nextInPort <= UP;
                 end if;
             when DOWN =>
-                if routingReq(LOCAL) = '1'      then nextIPORTS <= LOCAL;
-                elsif routingReq(EAST) = '1'    then nextIPORTS <= EAST;
-                elsif routingReq(SOUTH) = '1'   then nextIPORTS <= SOUTH;
-                elsif routingReq(WEST) = '1'    then nextIPORTS <= WEST;
-                elsif routingReq(NORTH) = '1'   then nextIPORTS <= NORTH;
-                elsif routingReq(UP) = '1'      then nextIPORTS <= UP;
-                else nextIPORTS <= DOWN;
+                if routingReq(LOCAL) = '1'      then nextInPort <= LOCAL;
+                elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
+                elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
+                elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
+                elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
+                elsif routingReq(UP) = '1'      then nextInPort <= UP;
+                else nextInPort <= DOWN;
                 end if;
             when others =>
-                nextIPORTS <= LOCAL;
+                nextInPort <= LOCAL;
         end case;
     end process;
     
+    -- Routing
     routedOutPort <= XYZ(data(selectedInPort),address);
     
     ------------------------------
@@ -129,9 +130,10 @@ begin
             
         elsif rising_edge(clk) then
             case currentState is
+                
                 -- Takes the port selected by the round robin
                 when IDLE =>
-                    selectedInPort <= nextIPORTS;
+                    selectedInPort <= nextInPort;
                     
                     -- Wait for a port request.
                     if SIGNED(routingReq) /= 0 then

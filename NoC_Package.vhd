@@ -12,8 +12,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 package NoC_Package is
-
-    -- Constants
+    
+    ---------------
+    -- Constants --
+    ---------------
     
     -- Dimension X and Y need to be greater than 1, for 2D NoCs use Z = 1
     -- X grows from left to right, Y grows from front to back, Z grows from bottom to top
@@ -21,14 +23,20 @@ package NoC_Package is
     constant DIM_Y    : integer := 10;
     constant DIM_Z    : integer := 9;
     
+    -- Data and control buses 
     constant DATA_WIDTH     : integer := 16;
     constant CONTROL_WIDTH  : integer := 3;
     
+    -- Control signals identification
     constant EOP        : integer := 0;
     constant RX         : integer := 1;
     constant TX         : integer := 1;
     constant STALL_GO   : integer := 2;
 
+    -- Number of router ports
+    constant PORTS      : integer := 7;
+    
+    -- Router ports identification
     constant LOCAL      : integer := 0;
     constant EAST       : integer := 1;
     constant SOUTH      : integer := 2;
@@ -37,13 +45,15 @@ package NoC_Package is
     constant UP         : integer := 5;
     constant DOWN       : integer := 6;
     
+    -- Input buffers depth
     constant BUFFER_DEPTH : integer := 8; -- Buffer depth must be greater than 1 and a power of 2
     
-    constant PORTS : integer := 7;
     
-    -- Types of arrays
+    -----------------
+    -- Array types --
+    -----------------
     
-    -- Types used at Router and SwitchControl interface.
+    -- Types used at Router (Router.vhd) and Switch Control (SwitchControl.vhd) interfaces.
     -- Each element indicates a port (LOCAL, EAST, WEST, NORTH, SOUTH, UP or DOWN).
     type Array1D_data is array (natural range <>) of std_logic_vector(DATA_WIDTH-1 downto 0);
     type Array1D_control is array (natural range <>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
@@ -59,10 +69,11 @@ package NoC_Package is
     type Array4D_data is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(DATA_WIDTH-1 downto 0);
     type array4D_control is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
 
+    -- Buffer to store flits instantiated at port (InputBuffer.vhd)
     type DataBuff is array(0 to BUFFER_DEPTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
     
     function Log2(temp : natural) return natural;
-    function Address(x,y,z : natural)return std_logic_vector;
+    function Address(x,y,z : natural) return std_logic_vector;
     function GetX(address : std_logic_vector(DATA_WIDTH-1 downto 0)) return natural;
     function GetY(address : std_logic_vector(DATA_WIDTH-1 downto 0)) return natural;
     function GetZ(address : std_logic_vector(DATA_WIDTH-1 downto 0)) return natural;
@@ -84,8 +95,15 @@ package body NoC_Package is
         return 0;
     end function Log2;
     
-    -- Function returns the address of a router in flit format.
-    function Address(x,y,z : natural)return std_logic_vector is
+    -- Function returns the address of a router in flit header format.
+    --
+    --                       DATA_WIDTH
+    --      |--------------------------------------------|
+    --
+    --      +--------+-----------+-----------+-----------+
+    --      | 00...0 |  X_FIELD  |  Y_FIELD  |  Z_FIELD  |
+    --      +--------+-----------+-----------+-----------+
+    function Address(x,y,z : natural) return std_logic_vector is
         variable address : std_logic_vector(DATA_WIDTH-1 downto 0);
         variable binX : std_logic_vector(Log2(DIM_X)-1 downto 0);
         variable binY : std_logic_vector(Log2(DIM_Y)-1 downto 0);
@@ -94,18 +112,17 @@ package body NoC_Package is
         variable zeros3D: std_logic_vector(15-(Log2(DIM_X)+Log2(DIM_Y)+Log2(DIM_Z)) downto 0);
     begin
         if(DIM_Z = 1) then -- NoC 2D
-            binX := std_logic_vector(to_unsigned(x,Log2(DIM_X)));
-            binY := std_logic_vector(to_unsigned(y,Log2(DIM_Y)));
+            binX := std_logic_vector(TO_UNSIGNED(x,Log2(DIM_X)));
+            binY := std_logic_vector(TO_UNSIGNED(y,Log2(DIM_Y)));
             zeros2D := (others=>'0');
             address := zeros2D & binX & binY;
         else  -- NoC 3D
-            binX := std_logic_vector(to_unsigned(x,Log2(DIM_X)));
-            binY := std_logic_vector(to_unsigned(y,Log2(DIM_Y)));
-            binZ := std_logic_vector(to_unsigned(z,Log2(DIM_Z)));
+            binX := std_logic_vector(TO_UNSIGNED(x,Log2(DIM_X)));
+            binY := std_logic_vector(TO_UNSIGNED(y,Log2(DIM_Y)));
+            binZ := std_logic_vector(TO_UNSIGNED(z,Log2(DIM_Z)));
             zeros3D := (others=>'0');
             address := zeros3D & binX & binY & binZ;
         end if;
-        return address;
 
         return address;
     end function Address;
@@ -140,35 +157,40 @@ package body NoC_Package is
     
     -- Function returns the port that should be used to send the packet according the XYZ algorithm.
     function XYZ(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer is
+        -- Routed output port
         variable outputPort : integer range 0 to PORTS-1;
+        
+        -- Current router address
         variable currentX   : integer range 0 to DIM_X-1 := GetX(current);
         variable currentY   : integer range 0 to DIM_Y-1 := GetY(current);
         variable currentZ   : integer range 0 to DIM_Z-1 := GetZ(current);
-        variable tarGetX    : integer range 0 to DIM_X-1 := GetX(target);
-        variable tarGetY    : integer range 0 to DIM_Y-1 := GetY(target);
-        variable tarGetZ    : integer range 0 to DIM_Z-1 := GetZ(target);
-    begin
-        if(currentX = tarGetX) then
         
-            if(currentY = tarGetY) then
+        -- Target router address
+        variable targetX    : integer range 0 to DIM_X-1 := GetX(target);
+        variable targetY    : integer range 0 to DIM_Y-1 := GetY(target);
+        variable targetZ    : integer range 0 to DIM_Z-1 := GetZ(target);
+    begin
+        if(currentX = targetX) then
+        
+            if(currentY = targetY) then
             
-                if(currentZ = tarGetZ) then
+                if(currentZ = targetZ) then
                     outputPort := LOCAL;
-                elsif(currentZ < tarGetZ) then
+                elsif(currentZ < targetZ) then
                     outputPort := UP;
-                else --currentZ > tarGetZ
+                else --currentZ > targetZ
                     outputPort := DOWN;
                 end if;
                 
-            elsif (currentY < tarGetY) then
+            elsif (currentY < targetY) then
                 outputPort := NORTH;
-            else --currentY > tarGetY
+            else --currentY > targetY
                 outputPort := SOUTH;
             end if;
             
-        elsif (currentX < tarGetX) then
+        elsif (currentX < targetX) then
             outputPort := EAST;
-        else --currentX > tarGetX
+        else --currentX > targetX
             outputPort := WEST;
         end if;
         

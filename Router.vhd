@@ -27,23 +27,23 @@ generic(address: std_logic_vector(DATA_WIDTH-1 downto 0));
 end Router;
 
 architecture Router of Router is
-    signal table            : Array1D_ports(0 to PORTS-1);
+    signal routingTable     : Array1D_ports(0 to PORTS-1);
     signal bufferDataOut    : Array1D_data(0 to PORTS-1);
     signal bufferControlOut : Array1D_control(0 to PORTS-1);
-    signal routingRequest    : std_logic_vector(PORTS-1 downto 0);
+    signal routingRequest   : std_logic_vector(PORTS-1 downto 0);
     signal routingAck       : std_logic_vector(PORTS-1 downto 0);
-    signal sending       : std_logic_vector(PORTS-1 downto 0);
+    signal sending          : std_logic_vector(PORTS-1 downto 0);
 begin
 --------------------------------------------------------------------------------------
 -- CROSSBAR
 --------------------------------------------------------------------------------------
 CROSSBAR: entity work.Crossbar
     port map(   
-        table       => table,
-        data_in     => bufferDataOut,
-        control_in  => bufferControlOut,
-        data_out    => data_out,
-        control_out => control_out
+        routingTable    => routingTable,
+        data_in         => bufferDataOut,
+        control_in      => bufferControlOut,
+        data_out        => data_out,
+        control_out     => control_out
     );
 --------------------------------------------------------------------------------------
 -- SWITCH CONTROL
@@ -51,13 +51,13 @@ CROSSBAR: entity work.Crossbar
 SWITCH_CONTROL: entity work.SwitchControl
     generic map(address  => address)
     port map(
-        clk         => clk,
-        rst         => rst,
-        routingReq  => routingRequest,
-        routingAck  => routingAck,
-        data        => bufferDataOut,
-        sending     => sending,
-        table       => table
+        clk             => clk,
+        rst             => rst,
+        routingReq      => routingRequest,
+        routingAck      => routingAck,
+        data            => bufferDataOut,
+        sending         => sending,
+        table           => routingTable
     );
 --------------------------------------------------------------------------------------
 -- NOTE: maybe we can make a "for" to construct this buffer instantiation 

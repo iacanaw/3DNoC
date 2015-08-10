@@ -35,15 +35,14 @@ architecture behavioral of InputBuffer is
     type state is (IDLE, TRANSMITTING);
     signal currentState : state;
     
-    -- "first" and "last" pointers are calculated based on BUFFER_DEPTH
+    -- "first" and "last" indexes width calculated based on BUFFER_DEPTH
     -- Used to control the circular queue
-    signal first,last       : unsigned((log2(BUFFER_DEPTH)-1) downto 0);
+    signal first,last       : UNSIGNED((log2(BUFFER_DEPTH)-1) downto 0);
     signal available_slot   : std_logic;
-    signal data_read        : std_logic_vector(DATA_WIDTH-1 downto 0);
     
     -- Buffer works in a circular queue - first in first out
     signal queue            : DataBuff;
-    -- EOP signal is declared here to allow the use of eop_buff <= (others=>'0')) 
+    -- Store the EOP signal relative to each flit stored in queue 
     signal eop_buff            : std_logic_vector(BUFFER_DEPTH-1 downto 0);
 
 begin
@@ -68,16 +67,16 @@ begin
         end if;
     end process;
         
-    -- Determine if there is an available slot in the buffer
+    -- Determine if there is any available slot in the buffer
     available_slot <= '0' when ((CONV_INTEGER(first) = 0) and (last = BUFFER_DEPTH-1)) or (first = last+1) else '1';    
     
-    -- Connect the next to-be-transmitted flit to the data output
+    -- Connect the queue output (next to-be-transmitted flit) to the data output
     data_out <= queue(CONV_INTEGER(first));
     
-    -- Connect the EOP flag to the control output
+    -- Connect the EOP signal to the control output
     control_out(EOP) <= eop_buff(CONV_INTEGER(first));
     
-    -- Connect the STALL_GO flag to the control output
+    -- Connect the STALL_GO signal to the control output
     control_out(STALL_GO) <= available_slot;
     
     -- Signal transmission to the receiver
@@ -101,7 +100,7 @@ begin
         elsif rising_edge(clk) then
             case currentState is
             
-                -- Wait for the queue to fill a slot
+                -- Wait for the queue to store a flit
                 -- Request routing for current package
                 when IDLE =>
                     if routingAck = '1' then
@@ -115,7 +114,7 @@ begin
                 
                     -- Verifies if receiver has an available slot and there is data to be sent
                     if control_in(STALL_GO)='1' and last /= first then
-                        first <= first + 1;
+                        first <= first + 1;     -- Set the next flit to be transmitted
                         
                         -- If the last packet flit was transmitted, finish the transmission
                         if eop_buff(CONV_INTEGER(first)) = '1' then
