@@ -43,7 +43,10 @@ if { [llength $sourceFiles] > 0 } {
 puts "\n*** Compilation OK ;) ***"
 
 # Start simulation
-vsim $top
+#vsim $top
+
+# TopNoC wave
+do wave_topnoc.do
 
 # Crossbar_tb wave
 #cb_wave.do

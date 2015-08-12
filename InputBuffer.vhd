@@ -10,7 +10,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use work.NoC_Package.all;
-use IEEE.std_logic_arith.all;
+use IEEE.numeric_std.all;
 
 entity InputBuffer is
     port(
@@ -60,21 +60,21 @@ begin
             -- store the data flit in the free slot pointed by last
             -- Each buffer slot has an EOP flag assigned to it (eop_buff)
             if control_in(RX) = '1' and available_slot = '1' then
-                queue(CONV_INTEGER(last)) <= data_in;
-                eop_buff(CONV_INTEGER(last)) <= control_in(EOP);
+                queue(TO_INTEGER(last)) <= data_in;
+                eop_buff(TO_INTEGER(last)) <= control_in(EOP);
                 last <= last + 1;                                        
             end if;
         end if;
     end process;
         
     -- Determine if there is any available slot in the buffer
-    available_slot <= '0' when ((CONV_INTEGER(first) = 0) and (last = BUFFER_DEPTH-1)) or (first = last+1) else '1';    
+    available_slot <= '0' when ((TO_INTEGER(first) = 0) and (last = BUFFER_DEPTH-1)) or (first = last+1) else '1';    
     
     -- Connect the queue output (next to-be-transmitted flit) to the data output
-    data_out <= queue(CONV_INTEGER(first));
+    data_out <= queue(TO_INTEGER(first));
     
     -- Connect the EOP signal to the control output
-    control_out(EOP) <= eop_buff(CONV_INTEGER(first));
+    control_out(EOP) <= eop_buff(TO_INTEGER(first));
     
     -- Connect the STALL_GO signal to the control output
     control_out(STALL_GO) <= available_slot;
@@ -117,7 +117,7 @@ begin
                         first <= first + 1;     -- Set the next flit to be transmitted
                         
                         -- If the last packet flit was transmitted, finish the transmission
-                        if eop_buff(CONV_INTEGER(first)) = '1' then
+                        if eop_buff(TO_INTEGER(first)) = '1' then
                             currentState <= IDLE;
                         else
                             currentState <= TRANSMITTING;

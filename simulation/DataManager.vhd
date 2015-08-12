@@ -16,8 +16,8 @@ use work.Text_Package.all;
 
 entity DataManager is 
     generic(
-            fileNameIn  : string := "000fileIn";
-            fileNameOut : string := "000fileOut"
+            fileNameIn  : string;
+            fileNameOut : string
     );
     port(
         clk : in std_logic;

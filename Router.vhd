@@ -60,110 +60,125 @@ SWITCH_CONTROL: entity work.SwitchControl
         table           => routingTable
     );
 --------------------------------------------------------------------------------------
--- NOTE: maybe we can make a "for" to construct this buffer instantiation 
+-- Buffers instantiation with a for ... generate
 --------------------------------------------------------------------------------------
--- LOCAL PORT
---------------------------------------------------------------------------------------
-LOCAL_BUFFER: entity work.InputBuffer 
-    port map(
-        clk             => clk,
-        rst             => rst,
-        data_in         => data_in(LOCAL),
-        control_in      => control_in(LOCAL),
-        data_out        => bufferDataOut(LOCAL),
-        control_out     => bufferControlOut(LOCAL),
-        routingRequest  => routingRequest(LOCAL),
-        routingAck      => routingAck(LOCAL),
-        sending         => sending(LOCAL)
-    );
---------------------------------------------------------------------------------------
--- EAST PORT
---------------------------------------------------------------------------------------
-EAST_BUFFER: entity work.InputBuffer 
-    port map(
-        clk             => clk,
-        rst             => rst,
-        data_in         => data_in(EAST),
-        control_in      => control_in(EAST),
-        data_out        => bufferDataOut(EAST),
-        control_out     => bufferControlOut(EAST),
-        routingRequest  => routingRequest(EAST),
-        routingAck      => routingAck(EAST),
-        sending         => sending(EAST)
-    );
---------------------------------------------------------------------------------------
--- SOUTH PORT
---------------------------------------------------------------------------------------
-SOUTH_BUFFER: entity work.InputBuffer 
-    port map(
-        clk             => clk,
-        rst             => rst,
-        data_in         => data_in(SOUTH),
-        control_in      => control_in(SOUTH),
-        data_out        => bufferDataOut(SOUTH),
-        control_out     => bufferControlOut(SOUTH),
-        routingRequest  => routingRequest(SOUTH),
-        routingAck      => routingAck(SOUTH),
-        sending         => sending(SOUTH)
-    );
---------------------------------------------------------------------------------------
--- WEST PORT
---------------------------------------------------------------------------------------
-WEST_BUFFER: entity work.InputBuffer 
-    port map(
-        clk             => clk,
-        rst             => rst,
-        data_in         => data_in(WEST),
-        control_in      => control_in(WEST),
-        data_out        => bufferDataOut(WEST),
-        control_out     => bufferControlOut(WEST),
-        routingRequest  => routingRequest(WEST),
-        routingAck      => routingAck(WEST),
-        sending         => sending(WEST)
-    );
---------------------------------------------------------------------------------------
--- NORTH PORT
---------------------------------------------------------------------------------------
-NORTH_BUFFER: entity work.InputBuffer 
-    port map(
-        clk             => clk,
-        rst             => rst,
-        data_in         => data_in(NORTH),
-        control_in      => control_in(NORTH),
-        data_out        => bufferDataOut(NORTH),
-        control_out     => bufferControlOut(NORTH),
-        routingRequest  => routingRequest(NORTH),
-        routingAck      => routingAck(NORTH),
-        sending         => sending(NORTH)
-    );
---------------------------------------------------------------------------------------
--- UP PORT
---------------------------------------------------------------------------------------
-UP_BUFFER: entity work.InputBuffer 
-    port map(
-        clk             => clk,
-        rst             => rst,
-        data_in         => data_in(UP),
-        control_in      => control_in(UP),
-        data_out        => bufferDataOut(UP),
-        control_out     => bufferControlOut(UP),
-        routingRequest  => routingRequest(UP),
-        routingAck      => routingAck(UP),
-        sending         => sending(UP)
-    );
---------------------------------------------------------------------------------------
--- DOWN PORT
---------------------------------------------------------------------------------------
-DOWN_BUFFER: entity work.InputBuffer 
-    port map(
-        clk             => clk,
-        rst             => rst,
-        data_in         => data_in(DOWN),
-        control_in      => control_in(DOWN),
-        data_out        => bufferDataOut(DOWN),
-        control_out     => bufferControlOut(DOWN),
-        routingRequest  => routingRequest(DOWN),
-        routingAck      => routingAck(DOWN),
-        sending         => sending(DOWN)
-    );
+	PortBuffers: for n in 0 to PORTS-1 generate
+		BufferN: entity work.InputBuffer 
+		port map(
+			clk             => clk,
+			rst             => rst,
+			data_in         => data_in(n),
+			control_in      => control_in(n),
+			data_out        => bufferDataOut(n),
+			control_out     => bufferControlOut(n),
+			routingRequest  => routingRequest(n),
+			routingAck      => routingAck(n),
+			sending         => sending(n)
+		);
+	end generate;
+-- --------------------------------------------------------------------------------------
+-- -- LOCAL PORT
+-- --------------------------------------------------------------------------------------
+-- LOCAL_BUFFER: entity work.InputBuffer 
+    -- port map(
+        -- clk             => clk,
+        -- rst             => rst,
+        -- data_in         => data_in(LOCAL),
+        -- control_in      => control_in(LOCAL),
+        -- data_out        => bufferDataOut(LOCAL),
+        -- control_out     => bufferControlOut(LOCAL),
+        -- routingRequest  => routingRequest(LOCAL),
+        -- routingAck      => routingAck(LOCAL),
+        -- sending         => sending(LOCAL)
+    -- );
+-- --------------------------------------------------------------------------------------
+-- -- EAST PORT
+-- --------------------------------------------------------------------------------------
+-- EAST_BUFFER: entity work.InputBuffer 
+    -- port map(
+        -- clk             => clk,
+        -- rst             => rst,
+        -- data_in         => data_in(EAST),
+        -- control_in      => control_in(EAST),
+        -- data_out        => bufferDataOut(EAST),
+        -- control_out     => bufferControlOut(EAST),
+        -- routingRequest  => routingRequest(EAST),
+        -- routingAck      => routingAck(EAST),
+        -- sending         => sending(EAST)
+    -- );
+-- --------------------------------------------------------------------------------------
+-- -- SOUTH PORT
+-- --------------------------------------------------------------------------------------
+-- SOUTH_BUFFER: entity work.InputBuffer 
+    -- port map(
+        -- clk             => clk,
+        -- rst             => rst,
+        -- data_in         => data_in(SOUTH),
+        -- control_in      => control_in(SOUTH),
+        -- data_out        => bufferDataOut(SOUTH),
+        -- control_out     => bufferControlOut(SOUTH),
+        -- routingRequest  => routingRequest(SOUTH),
+        -- routingAck      => routingAck(SOUTH),
+        -- sending         => sending(SOUTH)
+    -- );
+-- --------------------------------------------------------------------------------------
+-- -- WEST PORT
+-- --------------------------------------------------------------------------------------
+-- WEST_BUFFER: entity work.InputBuffer 
+    -- port map(
+        -- clk             => clk,
+        -- rst             => rst,
+        -- data_in         => data_in(WEST),
+        -- control_in      => control_in(WEST),
+        -- data_out        => bufferDataOut(WEST),
+        -- control_out     => bufferControlOut(WEST),
+        -- routingRequest  => routingRequest(WEST),
+        -- routingAck      => routingAck(WEST),
+        -- sending         => sending(WEST)
+    -- );
+-- --------------------------------------------------------------------------------------
+-- -- NORTH PORT
+-- --------------------------------------------------------------------------------------
+-- NORTH_BUFFER: entity work.InputBuffer 
+    -- port map(
+        -- clk             => clk,
+        -- rst             => rst,
+        -- data_in         => data_in(NORTH),
+        -- control_in      => control_in(NORTH),
+        -- data_out        => bufferDataOut(NORTH),
+        -- control_out     => bufferControlOut(NORTH),
+        -- routingRequest  => routingRequest(NORTH),
+        -- routingAck      => routingAck(NORTH),
+        -- sending         => sending(NORTH)
+    -- );
+-- --------------------------------------------------------------------------------------
+-- -- UP PORT
+-- --------------------------------------------------------------------------------------
+-- UP_BUFFER: entity work.InputBuffer 
+    -- port map(
+        -- clk             => clk,
+        -- rst             => rst,
+        -- data_in         => data_in(UP),
+        -- control_in      => control_in(UP),
+        -- data_out        => bufferDataOut(UP),
+        -- control_out     => bufferControlOut(UP),
+        -- routingRequest  => routingRequest(UP),
+        -- routingAck      => routingAck(UP),
+        -- sending         => sending(UP)
+    -- );
+-- --------------------------------------------------------------------------------------
+-- -- DOWN PORT
+-- --------------------------------------------------------------------------------------
+-- DOWN_BUFFER: entity work.InputBuffer 
+    -- port map(
+        -- clk             => clk,
+        -- rst             => rst,
+        -- data_in         => data_in(DOWN),
+        -- control_in      => control_in(DOWN),
+        -- data_out        => bufferDataOut(DOWN),
+        -- control_out     => bufferControlOut(DOWN),
+        -- routingRequest  => routingRequest(DOWN),
+        -- routingAck      => routingAck(DOWN),
+        -- sending         => sending(DOWN)
+    -- );
 end architecture;
