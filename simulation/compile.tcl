@@ -46,7 +46,7 @@ puts "\n*** Compilation OK ;) ***"
 #vsim $top
 
 # TopNoC wave
-do wave_topnoc.do
+#do wave_topnoc.do
 
 # Crossbar_tb wave
 #cb_wave.do

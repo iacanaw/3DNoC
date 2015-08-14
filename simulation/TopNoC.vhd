@@ -28,7 +28,7 @@ begin
     
     clk <= not clk after 5 ns;
     
-    rst <= '1', '0' after 7 ns;
+    rst <= '1', '0' after 3 ns;
     
     DataManager_x: for x in 0 to DIM_X-1 generate
         DataManager_y: for y in 0 to DIM_Y-1 generate

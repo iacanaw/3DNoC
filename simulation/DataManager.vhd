@@ -36,17 +36,22 @@ begin
     SEND: block
         type state is (S0, S1);
         signal currentState : state;
-        signal words : std_logic_vector(32 downto 0); -- 33 = 32_word + 1_eop
+        signal words : std_logic_vector(DATA_WIDTH+3 downto 0); --  eop + word 
         file flitFile : text open read_mode is fileNameIn;
     begin
-        control_out(TX) <= '1' when currentState = S0 else '0';
         process(clk, rst)
             variable flitLine   : line;
-            variable str        : string(1 to 9);
+            variable str        : string(1 to 5);
         begin 
             if rst = '1' then
                 currentState <= S1;
-                words <= (OTHERS=>'0');
+				if not(endfile(flitFile)) then
+					readline(flitFile, flitLine);
+					read(flitLine, str);
+					words <= StringToStdLogicVector(str);
+				else
+					words <= (OTHERS=>'0');
+				end if;
             elsif rising_edge(clk) then
                 case currentState is
                     when S0 =>
@@ -55,11 +60,10 @@ begin
                                 readline(flitFile, flitLine);
                                 read(flitLine, str);
                                 words <= StringToStdLogicVector(str);
-                                data_out <= words(DATA_WIDTH-1 downto 0);
-                                control_out(EOP) <= words(32);
                                 currentState <= S0;
                             else -- Local port haven't space on buffer
                                 currentState <= S0;
+								words <= (OTHERS=>'0');
                             end if;
                         else -- End of File
                             currentState <= S1;
@@ -74,30 +78,35 @@ begin
                 end case;
             end if;
         end process;
+		data_out <= words(DATA_WIDTH-1 downto 0);
+		control_out(EOP) <= words(DATA_WIDTH);
+		control_out(TX) <= '1' when currentState = S0 else '0';
     end block SEND;
     
     RECIEVE: block
         type state is (S0);
         signal currentState : state;
+		signal completeLine : std_logic_vector(DATA_WIDTH+3 downto 0);
         file flitFile : text open write_mode is fileNameOut;
     begin
-        control_out(STALL_GO) <= '1';
-         process(clk, rst)
+		completeLine <= b"000" & control_in(EOP) & data_in;
+        process(clk, rst)
             variable flitLine   : line;
             variable str        : string (1 to 9);
         begin
             if rst = '1' then
-                control_out(STALL_GO) <= '0';
                 currentState <= S0;
+				control_out(STALL_GO) <= '0';
             elsif rising_edge(clk) then
                 case currentState is
                     when S0 =>
                         if control_in(RX) = '1' then
-                            write(flitLine, StdLogicVectorToString(control_in(EOP)&data_in));
+                            write(flitLine, StdLogicVectorToString(completeLine));
                             writeline(flitFile, flitLine);
                         end if;
-                        currentState <= S0;
+						currentState <= S0;
                 end case;
+				control_out(STALL_GO) <= '1';
             end if;
         end process;
     end block RECIEVE;

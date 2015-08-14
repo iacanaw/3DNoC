@@ -28,54 +28,68 @@ end Router;
 
 architecture Router of Router is
     signal routingTable     : Array1D_ports(0 to PORTS-1);
-    signal bufferDataOut    : Array1D_data(0 to PORTS-1);
-    signal bufferControlOut : Array1D_control(0 to PORTS-1);
+    signal crossbarDataIn    : Array1D_data(0 to PORTS-1);
+    signal crossbarControlIn : Array1D_control(0 to PORTS-1);
     signal routingRequest   : std_logic_vector(PORTS-1 downto 0);
     signal routingAck       : std_logic_vector(PORTS-1 downto 0);
     signal sending          : std_logic_vector(PORTS-1 downto 0);
+	signal crossbarControlOut 	: Array1D_control(0 to PORTS-1);
 begin
+	
 --------------------------------------------------------------------------------------
 -- CROSSBAR
 --------------------------------------------------------------------------------------
 CROSSBAR: entity work.Crossbar
     port map(   
-        routingTable    => routingTable,
-        data_in         => bufferDataOut,
-        control_in      => bufferControlOut,
-        data_out        => data_out,
-        control_out     => control_out
+        routingTable => routingTable,
+        data_in      => crossbarDataIn,
+        control_in   => crossbarControlIn,
+        data_out     => data_out,
+        control_out  => crossbarControlOut
     );
+	
 --------------------------------------------------------------------------------------
 -- SWITCH CONTROL
 --------------------------------------------------------------------------------------
 SWITCH_CONTROL: entity work.SwitchControl
     generic map(address  => address)
     port map(
-        clk             => clk,
-        rst             => rst,
-        routingReq      => routingRequest,
-        routingAck      => routingAck,
-        data            => bufferDataOut,
-        sending         => sending,
-        table           => routingTable
+        clk         => clk,
+        rst         => rst,
+        routingReq  => routingRequest,
+        routingAck  => routingAck,
+        data        => crossbarDataIn,
+        sending     => sending,
+        table       => routingTable
     );
 --------------------------------------------------------------------------------------
--- Buffers instantiation with a for ... generate
+-- Buffers instantiation with for ... generate
 --------------------------------------------------------------------------------------
 	PortBuffers: for n in 0 to PORTS-1 generate
 		BufferN: entity work.InputBuffer 
 		port map(
-			clk             => clk,
-			rst             => rst,
-			data_in         => data_in(n),
-			control_in      => control_in(n),
-			data_out        => bufferDataOut(n),
-			control_out     => bufferControlOut(n),
-			routingRequest  => routingRequest(n),
-			routingAck      => routingAck(n),
-			sending         => sending(n)
+			clk             		=> clk,
+			rst             		=> rst,
+			data_in         		=> data_in(n),
+			control_in(EOP) 		=> control_in(n)(EOP),
+			control_in(RX)  		=> control_in(n)(RX),
+			control_in(STALL_GO)	=> crossbarControlOut(n)(STALL_GO),
+			data_out        		=> crossbarDataIn(n),
+			control_out(EOP)		=> crossbarControlIn(n)(EOP),
+			control_out(RX)			=> crossbarControlIn(n)(RX),
+			control_out(STALL_GO) 	=> control_out(n)(STALL_GO),
+			routingRequest  		=> routingRequest(n),
+			routingAck      		=> routingAck(n),
+			sending         		=> sending(n)
 		);
+		
+		control_out(n)(EOP)				<= crossbarControlOut(n)(EOP);
+		control_out(n)(RX) 				<= crossbarControlOut(n)(RX);
+		crossbarControlIn(n)(STALL_GO) 	<= control_in(n)(STALL_GO); 
+		
 	end generate;
+	
+
 -- --------------------------------------------------------------------------------------
 -- -- LOCAL PORT
 -- --------------------------------------------------------------------------------------
@@ -85,8 +99,8 @@ SWITCH_CONTROL: entity work.SwitchControl
         -- rst             => rst,
         -- data_in         => data_in(LOCAL),
         -- control_in      => control_in(LOCAL),
-        -- data_out        => bufferDataOut(LOCAL),
-        -- control_out     => bufferControlOut(LOCAL),
+        -- data_out        => crossbarDataIn(LOCAL),
+        -- control_out     => crossbarControlIn(LOCAL),
         -- routingRequest  => routingRequest(LOCAL),
         -- routingAck      => routingAck(LOCAL),
         -- sending         => sending(LOCAL)
@@ -100,8 +114,8 @@ SWITCH_CONTROL: entity work.SwitchControl
         -- rst             => rst,
         -- data_in         => data_in(EAST),
         -- control_in      => control_in(EAST),
-        -- data_out        => bufferDataOut(EAST),
-        -- control_out     => bufferControlOut(EAST),
+        -- data_out        => crossbarDataIn(EAST),
+        -- control_out     => crossbarControlIn(EAST),
         -- routingRequest  => routingRequest(EAST),
         -- routingAck      => routingAck(EAST),
         -- sending         => sending(EAST)
@@ -115,8 +129,8 @@ SWITCH_CONTROL: entity work.SwitchControl
         -- rst             => rst,
         -- data_in         => data_in(SOUTH),
         -- control_in      => control_in(SOUTH),
-        -- data_out        => bufferDataOut(SOUTH),
-        -- control_out     => bufferControlOut(SOUTH),
+        -- data_out        => crossbarDataIn(SOUTH),
+        -- control_out     => crossbarControlIn(SOUTH),
         -- routingRequest  => routingRequest(SOUTH),
         -- routingAck      => routingAck(SOUTH),
         -- sending         => sending(SOUTH)
@@ -130,8 +144,8 @@ SWITCH_CONTROL: entity work.SwitchControl
         -- rst             => rst,
         -- data_in         => data_in(WEST),
         -- control_in      => control_in(WEST),
-        -- data_out        => bufferDataOut(WEST),
-        -- control_out     => bufferControlOut(WEST),
+        -- data_out        => crossbarDataIn(WEST),
+        -- control_out     => crossbarControlIn(WEST),
         -- routingRequest  => routingRequest(WEST),
         -- routingAck      => routingAck(WEST),
         -- sending         => sending(WEST)
@@ -145,8 +159,8 @@ SWITCH_CONTROL: entity work.SwitchControl
         -- rst             => rst,
         -- data_in         => data_in(NORTH),
         -- control_in      => control_in(NORTH),
-        -- data_out        => bufferDataOut(NORTH),
-        -- control_out     => bufferControlOut(NORTH),
+        -- data_out        => crossbarDataIn(NORTH),
+        -- control_out     => crossbarControlIn(NORTH),
         -- routingRequest  => routingRequest(NORTH),
         -- routingAck      => routingAck(NORTH),
         -- sending         => sending(NORTH)
@@ -160,8 +174,8 @@ SWITCH_CONTROL: entity work.SwitchControl
         -- rst             => rst,
         -- data_in         => data_in(UP),
         -- control_in      => control_in(UP),
-        -- data_out        => bufferDataOut(UP),
-        -- control_out     => bufferControlOut(UP),
+        -- data_out        => crossbarDataIn(UP),
+        -- control_out     => crossbarControlIn(UP),
         -- routingRequest  => routingRequest(UP),
         -- routingAck      => routingAck(UP),
         -- sending         => sending(UP)
@@ -175,8 +189,8 @@ SWITCH_CONTROL: entity work.SwitchControl
         -- rst             => rst,
         -- data_in         => data_in(DOWN),
         -- control_in      => control_in(DOWN),
-        -- data_out        => bufferDataOut(DOWN),
-        -- control_out     => bufferControlOut(DOWN),
+        -- data_out        => crossbarDataIn(DOWN),
+        -- control_out     => crossbarControlIn(DOWN),
         -- routingRequest  => routingRequest(DOWN),
         -- routingAck      => routingAck(DOWN),
         -- sending         => sending(DOWN)
