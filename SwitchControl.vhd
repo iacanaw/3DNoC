@@ -14,7 +14,7 @@ use ieee.numeric_std.all;
 
 entity SwitchControl is
     generic(
-        address : std_logic_vector(DATA_WIDTH-1 downto 0)        
+        address : std_logic_vector(DATA_WIDTH-1 downto 0)     := x"0000"    
     );
     port(
         clk         :    in    std_logic;
