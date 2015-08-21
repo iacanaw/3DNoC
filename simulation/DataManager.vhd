@@ -55,7 +55,7 @@ begin
             elsif rising_edge(clk) then
                 case currentState is
                     when S0 =>
-                        if not(endfile(flitFile)) then
+                        if not(endfile(flitFile)) or (control_in(STALL_GO)='0') then
                             if(control_in(STALL_GO)='1') then
                                 readline(flitFile, flitLine);
                                 read(flitLine, str);
@@ -63,7 +63,6 @@ begin
                                 currentState <= S0;
                             else -- Local port haven't space on buffer
                                 currentState <= S0;
-                                words <= (OTHERS=>'0');
                             end if;
                         else -- End of File
                             currentState <= S1;

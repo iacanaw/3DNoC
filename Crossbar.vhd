@@ -210,7 +210,7 @@ begin
                      control_in(EAST)(TX) when routingTable(EAST)(UP) = '1' else
                      control_in(SOUTH)(TX) when routingTable(SOUTH)(UP) = '1' else
                      control_in(WEST)(TX) when routingTable(WEST)(UP) = '1' else
-                     control_in(NORTH)(TX) when routingTable(DOWN)(NORTH) = '1' else
+                     control_in(NORTH)(TX) when routingTable(NORTH)(UP) = '1' else
                      '0';
     
     control_out(UP)(STALL_GO) <= control_in(DOWN)(STALL_GO) when routingTable(UP)(DOWN) = '1' else
@@ -230,7 +230,7 @@ begin
                      data_in(NORTH) when routingTable(NORTH)(DOWN) = '1' else
                      data_in(UP); --when routingTable(UP)(DOWN) = '1'
                     
-    control_out(DOWN)(EOP) <= control_in(EAST)(EOP) when routingTable(LOCAL)(DOWN) = '1' else
+    control_out(DOWN)(EOP) <= control_in(LOCAL)(EOP) when routingTable(LOCAL)(DOWN) = '1' else
                      control_in(EAST)(EOP) when routingTable(EAST)(DOWN) = '1' else
                      control_in(SOUTH)(EOP) when routingTable(SOUTH)(DOWN) = '1' else
                      control_in(WEST)(EOP) when routingTable(WEST)(DOWN) = '1' else
