@@ -12,7 +12,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 package NoC_Package is
-	
+    
     ---------------
     -- Constants --
     ---------------
@@ -74,7 +74,7 @@ package NoC_Package is
     function Log2(temp : natural) return natural;
     function Address(x,y,z : natural) return std_logic_vector;
     function XYZ(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer;
-	
+    
 end package;
 
 package body NoC_Package is
@@ -100,11 +100,11 @@ package body NoC_Package is
     --      +--------+-----------+-----------+-----------+
     --      | 00...0 |  X_FIELD  |  Y_FIELD  |  Z_FIELD  |
     --      +--------+-----------+-----------+-----------+
-	-- 
-	constant X_FIELD	: integer := Log2(DIM_X);
-	constant Y_FIELD	: integer := Log2(DIM_Y);
-	constant Z_FIELD	: integer := Log2(DIM_Z);
-	--
+    -- 
+    constant X_FIELD    : integer := Log2(DIM_X);
+    constant Y_FIELD    : integer := Log2(DIM_Y);
+    constant Z_FIELD    : integer := Log2(DIM_Z);
+    --
     function Address(x,y,z : natural) return std_logic_vector is
         variable address : std_logic_vector(DATA_WIDTH-1 downto 0);
         variable binX : std_logic_vector(X_FIELD-1 downto 0);
