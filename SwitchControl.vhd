@@ -24,7 +24,7 @@ entity SwitchControl is
         routingAck  :    out std_logic_vector(PORTS-1 downto 0);    -- Routing acknowledgement to input buffers
         data        :    in  Array1D_data(0 to PORTS-1);    -- Each array element corresponds to a input buffer data_out
         sending     :    in  std_logic_vector(PORTS-1 downto 0);  -- Each array element signals an input buffer transmiting data
-        table       :    out Array1D_ports(0 to PORTS-1)    -- Routing table to be connected to crossbar
+        table       :    out Array1D_3bits(0 to PORTS-1)    -- Routing table to be connected to crossbar
     );
 end SwitchControl;
 
@@ -34,7 +34,7 @@ architecture behavioral of SwitchControl is
     signal currentState: state;
     
     signal freePorts: std_logic_vector(PORTS-1 downto 0);   -- Status of all output ports (0 = free; 1 = busy)
-    signal routingTable: Array1D_ports(0 to PORTS-1); -- routingTable(inPort)(outPort)
+    signal routingTable: Array1D_3bits(0 to PORTS-1); -- routingTable(inPort): value = outPort
     signal selectedInPort: integer range 0 to PORTS-1;  -- Input port selected to routing
     signal nextInPort: integer range 0 to PORTS-1;  -- Next input port to be selected to routing
     signal routedOutPort: integer range 0 to PORTS-1;   -- Output port selected by the routing algorithm
@@ -124,8 +124,9 @@ begin
     process(clk, rst)
     begin
         if rst = '1' then
-            routingAck <= (others => '0');                  
-            routingTable <= (others=>(others=>'0'));            
+            routingAck <= (others=>'0');                  
+            routingTable <= (others=>(others=>'1'));
+            freePorts <= (others=>'0');
             currentState <= IDLE;
             
         elsif rising_edge(clk) then
@@ -146,15 +147,17 @@ begin
                     -- Frees the output ports released by the input ones 
                     for i in 0 to PORTS-1 loop
                         if sending(i) = '0' then
-                            routingTable(i) <= (others=>'0');
+                            routingTable(i) <= (others=>'1');
+                            freePorts(TO_INTEGER(UNSIGNED(routingTable(i)))) <= '0';
                         end if;
                     end loop;                      
                                     
                 -- Sets the routing table if the routed output port is available
                 when SET_ROUTING_TABLE =>    
                     if freePorts(routedOutPort) = '0' then  -- 0 = free;
-                        routingTable(selectedInPort)(routedOutPort) <= '1';
+                        routingTable(selectedInPort) <= STD_LOGIC_VECTOR(TO_UNSIGNED(routedOutPort,3));
                         routingAck(selectedInPort) <= '1';
+                        freePorts(routedOutPort) <= '1'; -- 1 means that the port is busy.
                         currentState <= ROUTING_ACK;
                     else
                         currentState <= IDLE;
@@ -174,10 +177,5 @@ begin
     end process;
     
     table <= routingTable;
-    
-    -- Update the current free output ports
-    FREE_PORTS: for i in 0 to PORTS-1 generate
-        freePorts(i) <= (routingTable(LOCAL)(i)) or (routingTable(EAST)(i)) or (routingTable(SOUTH)(i)) or (routingTable(WEST)(i)) or (routingTable(NORTH)(i)) or (routingTable(UP)(i)) or (routingTable(DOWN)(i));
-    end generate;
     
 end architecture;

@@ -57,6 +57,7 @@ package NoC_Package is
     type Array1D_data is array (natural range <>) of std_logic_vector(DATA_WIDTH-1 downto 0);
     type Array1D_control is array (natural range <>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
     type Array1D_ports is array (natural range<>) of std_logic_vector(PORTS-1 downto 0);
+    type Array1D_3bits is array (natural range<>) of std_logic_vector(2 downto 0);
     
     -- Types used at NoC interface. 
     -- In case of 3D NoCs, each element (x,y,z) indicates a router local port. 
@@ -66,8 +67,10 @@ package NoC_Package is
     
     -- Types used to interconnect routers when generating a NoC instance (NoC.vhd).
     type Array4D_data is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(DATA_WIDTH-1 downto 0);
-    type array4D_control is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
+    type Array4D_control is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
 
+    
+    
     -- Buffer to store flits instantiated at port (InputBuffer.vhd)
     type DataBuff is array(0 to BUFFER_DEPTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
     
