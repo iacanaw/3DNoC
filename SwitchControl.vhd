@@ -146,7 +146,7 @@ begin
                     -- Updates the routing table.
                     -- Frees the output ports released by the input ones 
                     for i in 0 to PORTS-1 loop
-                        if sending(i) = '0' then
+                        if sending(i) = '0' and TO_INTEGER(UNSIGNED(routingTable(i))) < PORTS then
                             routingTable(i) <= (others=>'1');
                             freePorts(TO_INTEGER(UNSIGNED(routingTable(i)))) <= '0';
                         end if;
