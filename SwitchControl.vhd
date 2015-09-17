@@ -30,7 +30,7 @@ end SwitchControl;
 
 architecture behavioral of SwitchControl is
    
-    type state is (IDLE,SET_ROUTING_TABLE,ROUTING_ACK);
+    type state is (IDLE,ROUTING_ACK);
     signal currentState: state;
     
     signal freePorts: std_logic_vector(PORTS-1 downto 0);   -- Status of all output ports (0 = free; 1 = busy)
@@ -116,7 +116,7 @@ begin
     end process;
     
     -- Routing
-    routedOutPort <= XYZ(data(selectedInPort),address);
+    routedOutPort <= XYZ(data(nextInPort),address);
     
     ------------------------------
     -- Routing table management --
@@ -137,8 +137,12 @@ begin
                     selectedInPort <= nextInPort;
                     
                     -- Wait for a port request.
-                    if SIGNED(routingReq) /= 0 then
-                        currentState <= SET_ROUTING_TABLE;
+                    -- Sets the routing table if the routed output port is available
+                    if SIGNED(routingReq) /= 0 and freePorts(routedOutPort) = '0' then
+                        routingTable(nextInPort) <= STD_LOGIC_VECTOR(TO_UNSIGNED(routedOutPort,3));
+                        routingAck(nextInPort) <= '1';
+                        freePorts(routedOutPort) <= '1'; -- 1 means that the port is busy.
+                        currentState <= ROUTING_ACK;
                     else
                         currentState <= IDLE;
                     end if;                    
@@ -151,18 +155,7 @@ begin
                             freePorts(TO_INTEGER(UNSIGNED(routingTable(i)))) <= '0';
                         end if;
                     end loop;                      
-                                    
-                -- Sets the routing table if the routed output port is available
-                when SET_ROUTING_TABLE =>    
-                    if freePorts(routedOutPort) = '0' then  -- 0 = free;
-                        routingTable(selectedInPort) <= STD_LOGIC_VECTOR(TO_UNSIGNED(routedOutPort,3));
-                        routingAck(selectedInPort) <= '1';
-                        freePorts(routedOutPort) <= '1'; -- 1 means that the port is busy.
-                        currentState <= ROUTING_ACK;
-                    else
-                        currentState <= IDLE;
-                    end if;
-                    
+                                                        
                 -- Holds the routing acknowledgement active for one cycle
                 when ROUTING_ACK =>
                     routingAck(selectedInPort) <= '0'; 
