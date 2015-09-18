@@ -136,6 +136,15 @@ begin
                 when IDLE =>
                     selectedInPort <= nextInPort;
                     
+                    -- Updates the routing table.
+                    -- Frees the output ports released by the input ones 
+                    for i in 0 to PORTS-1 loop
+                        if sending(i) = '0' and TO_INTEGER(UNSIGNED(routingTable(i))) < PORTS then
+                            routingTable(i) <= (others=>'1');
+                            freePorts(TO_INTEGER(UNSIGNED(routingTable(i)))) <= '0';
+                        end if;
+                    end loop;   
+                    
                     -- Wait for a port request.
                     -- Sets the routing table if the routed output port is available
                     if SIGNED(routingReq) /= 0 and freePorts(routedOutPort) = '0' then
@@ -146,16 +155,7 @@ begin
                     else
                         currentState <= IDLE;
                     end if;                    
-                    
-                    -- Updates the routing table.
-                    -- Frees the output ports released by the input ones 
-                    for i in 0 to PORTS-1 loop
-                        if sending(i) = '0' and TO_INTEGER(UNSIGNED(routingTable(i))) < PORTS then
-                            routingTable(i) <= (others=>'1');
-                            freePorts(TO_INTEGER(UNSIGNED(routingTable(i)))) <= '0';
-                        end if;
-                    end loop;                      
-                                                        
+                      
                 -- Holds the routing acknowledgement active for one cycle
                 when ROUTING_ACK =>
                     routingAck(selectedInPort) <= '0'; 
