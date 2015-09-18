@@ -3,8 +3,9 @@
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Jul 6th, 2015                                                     --
--- VERSION      : 0.1                                                               --
+-- VERSION      : 0.2.1                                                             --
 -- HISTORY      : Version 0.1 - Jul 6th, 2015                                       --
+--              : Version 0.2.1 - Set 18th, 2015                                    --
 --------------------------------------------------------------------------------------
 library IEEE;
 use ieee.std_logic_1164.all;
