@@ -3,7 +3,7 @@
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 8th, 2015                                                     --
--- VERSION      : 0.2.1                                                             --
+-- VERSION      : 0.2.2                                                             --
 -- HISTORY      : Version 0.1 - Apr 8th, 2015                                       --
 --              : Version 0.2.1 - Set 18th, 2015                                    --
 --------------------------------------------------------------------------------------
@@ -20,9 +20,12 @@ package NoC_Package is
     
     -- Dimension X and Y need to be greater than 1, for 2D NoCs use Z = 1
     -- X grows from left to right, Y grows from front to back, Z grows from bottom to top
-    constant DIM_X    : integer := 4;
+    constant DIM_X    : integer := 3;
     constant DIM_Y    : integer := 3;
-    constant DIM_Z    : integer := 4;
+    constant DIM_Z    : integer := 3;
+    -- Number of router ports
+    -- Must be 5 for 2D mesh and 7 for 3D mesh
+    constant PORTS      : integer := 7;
     
     -- Data and control buses 
     constant DATA_WIDTH     : integer := 16;
@@ -33,9 +36,6 @@ package NoC_Package is
     constant RX         : integer := 1;
     constant TX         : integer := 1;
     constant STALL_GO   : integer := 2;
-
-    -- Number of router ports
-    constant PORTS      : integer := 7;
     
     -- Router ports identification
     constant LOCAL      : integer := 0;
@@ -47,7 +47,7 @@ package NoC_Package is
     constant DOWN       : integer := 6;
     
     -- Input buffers depth
-    constant BUFFER_DEPTH : integer := 16; -- Buffer depth must be greater than 1 and a power of 2
+    constant BUFFER_DEPTH : integer := 8; -- Buffer depth must be greater than 1 and a power of 2
     
     -----------------
     -- Array types --
