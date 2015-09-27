@@ -22,10 +22,10 @@ package NoC_Package is
     -- X grows from left to right, Y grows from front to back, Z grows from bottom to top
     constant DIM_X    : integer := 3;
     constant DIM_Y    : integer := 3;
-    constant DIM_Z    : integer := 3;
+    constant DIM_Z    : integer := 1;
     -- Number of router ports
     -- Must be 5 for 2D mesh and 7 for 3D mesh
-    constant PORTS      : integer := 7;
+    constant PORTS      : integer := 5;
     
     -- Data and control buses 
     constant DATA_WIDTH     : integer := 16;
@@ -78,6 +78,7 @@ package NoC_Package is
     function Log2(temp : natural) return natural;
     function Address(x,y,z : natural) return std_logic_vector;
     function XYZ(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer;
+    function XY(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer;
     
 end package;
 
@@ -175,5 +176,40 @@ package body NoC_Package is
         return outputPort;
         
     end XYZ;
+    
+    -- Function returns the port that should be used to send the packet according the XYZ algorithm.
+    function XY(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer is
+        -- Routed output port
+        variable outputPort : integer range 0 to PORTS-1;
+        
+        -- Current router address
+        variable currentX   : std_logic_vector(X_FIELD-1 downto 0) := current(Y_FIELD+X_FIELD-1 downto Y_FIELD);
+        variable currentY   : std_logic_vector(Y_FIELD-1 downto 0) := current(Y_FIELD-1 downto 0);
+        
+        -- Target router address
+        variable targetX    : std_logic_vector(X_FIELD-1 downto 0) := target(Y_FIELD+X_FIELD-1 downto Y_FIELD);
+        variable targetY    : std_logic_vector(Y_FIELD-1 downto 0) := target(Y_FIELD-1 downto 0);
+    begin
+        if(currentX = targetX) then
+        
+            if(currentY = targetY) then
+            
+                outputPort := LOCAL;
+                
+            elsif (currentY < targetY) then
+                outputPort := NORTH;
+            else --currentY > targetY
+                outputPort := SOUTH;
+            end if;
+            
+        elsif (currentX < targetX) then
+            outputPort := EAST;
+        else --currentX > targetX
+            outputPort := WEST;
+        end if;
+        
+        return outputPort;
+        
+    end XY;
 
 end NoC_Package;

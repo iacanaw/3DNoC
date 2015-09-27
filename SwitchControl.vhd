@@ -88,6 +88,10 @@ begin
                     nextInPort <= LOCAL;
             end case;
         end process;
+        
+        -- Routing
+        routedOutPort <= XY(data(nextInPort),address);
+        
     end generate;
     
     NoC3D : if(DIM_X>1 and DIM_Y>1 and DIM_Z>1) generate
@@ -160,11 +164,23 @@ begin
                 when others =>
                     nextInPort <= LOCAL;
             end case;
-        end process;
+            
+            -- RR: for i in 0 to PORTS-1 generate
+                -- if (routingReq(((selectedInPort+i rem 6)+1)-(selectedInPort/6)) = '1') then
+                    -- nextInPort <= ((selectedInPort+i rem 6)+1)-(selectedInPort/6);
+                -- else
+                    -- nextInPort <= selectedInPort;
+                -- end if;
+            -- end generate;
+            
+         end process;
+
+        -- Routing
+        routedOutPort <= XYZ(data(nextInPort),address);
+        
     end generate;
     
-    -- Routing
-    routedOutPort <= XYZ(data(nextInPort),address);
+    
     
     ------------------------------
     -- Routing table management --

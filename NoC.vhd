@@ -35,10 +35,10 @@ architecture structural of NoC is
         port(
             clk            : in std_logic;
             rst            : in std_logic;
-            data_in        : in Array1D_data(0 to 6);
-            control_in     : in Array1D_control(0 to 6);
-            data_out       : out Array1D_data(0 to 6);
-            control_out    : out Array1D_control(0 to 6)
+            data_in        : in Array1D_data(0 to PORTS-1);
+            control_in     : in Array1D_control(0 to PORTS-1);
+            data_out       : out Array1D_data(0 to PORTS-1);
+            control_out    : out Array1D_control(0 to PORTS-1)
         );
     end component;
     
