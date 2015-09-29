@@ -22,10 +22,10 @@ package NoC_Package is
     -- X grows from left to right, Y grows from front to back, Z grows from bottom to top
     constant DIM_X    : integer := 3;
     constant DIM_Y    : integer := 3;
-    constant DIM_Z    : integer := 1;
+    constant DIM_Z    : integer := 3;
     -- Number of router ports
     -- Must be 5 for 2D mesh and 7 for 3D mesh
-    constant PORTS      : integer := 5;
+    constant PORTS      : integer := 7;
     
     -- Data and control buses 
     constant DATA_WIDTH     : integer := 16;
@@ -48,6 +48,10 @@ package NoC_Package is
     
     -- Input buffers depth
     constant BUFFER_DEPTH : integer := 8; -- Buffer depth must be greater than 1 and a power of 2
+    
+    constant NOT_ROUTED : std_logic_vector(2 downto 0) := "111";
+    constant FREE       : std_logic := '0';
+    constant BUSY       : std_logic := '1';
     
     -----------------
     -- Array types --
@@ -192,10 +196,8 @@ package body NoC_Package is
     begin
         if(currentX = targetX) then
         
-            if(currentY = targetY) then
-            
+            if(currentY = targetY) then            
                 outputPort := LOCAL;
-                
             elsif (currentY < targetY) then
                 outputPort := NORTH;
             else --currentY > targetY

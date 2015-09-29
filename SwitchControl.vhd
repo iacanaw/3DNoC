@@ -40,54 +40,18 @@ architecture behavioral of SwitchControl is
     signal nextInPort: integer range 0 to PORTS-1;  -- Next input port to be selected to routing
     signal routedOutPort: integer range 0 to PORTS-1;   -- Output port selected by the routing algorithm
     
+    signal req: std_logic_vector(7 downto 0);
+    signal lowerPriority, code: std_logic_vector(2 downto 0);
+    signal newRequest: std_logic;
+    
 begin
     
     -------------------------------------------------------------
     -- Round robin policy to chose the input port to be served --
     -------------------------------------------------------------
     NoC2D : if(DIM_X>1 and DIM_Y>1 and DIM_Z=1) generate
-        process(selectedInPort,routingReq)
-        begin
-            case selectedInPort is
-                when LOCAL =>
-                    if routingReq(EAST) = '1'       then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    else nextInPort <= LOCAL;
-                    end if;
-                when EAST =>
-                    if routingReq(SOUTH) = '1'      then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    else nextInPort <= EAST;
-                    end if;
-                when SOUTH =>
-                    if routingReq(WEST) = '1'       then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    else nextInPort <= SOUTH;
-                    end if;
-                when WEST =>
-                    if routingReq(NORTH) = '1'      then nextInPort <= NORTH;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    else nextInPort <= WEST;
-                    end if;
-                when NORTH =>
-                    if routingReq(LOCAL) = '1'      then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    else nextInPort <= NORTH;
-                    end if;
-                when others =>
-                    nextInPort <= LOCAL;
-            end case;
-        end process;
+        
+        req <= ("000" & routingReq);
         
         -- Routing
         routedOutPort <= XY(data(nextInPort),address);
@@ -95,92 +59,25 @@ begin
     end generate;
     
     NoC3D : if(DIM_X>1 and DIM_Y>1 and DIM_Z>1) generate
-        process(selectedInPort,routingReq)
-        begin
-            case selectedInPort is
-                when LOCAL =>
-                    if routingReq(EAST) = '1'       then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    elsif routingReq(UP) = '1'      then nextInPort <= UP;
-                    elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
-                    else nextInPort <= LOCAL;
-                    end if;
-                when EAST =>
-                    if routingReq(SOUTH) = '1'      then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    elsif routingReq(UP) = '1'      then nextInPort <= UP;
-                    elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    else nextInPort <= EAST;
-                    end if;
-                when SOUTH =>
-                    if routingReq(WEST) = '1'       then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    elsif routingReq(UP) = '1'      then nextInPort <= UP;
-                    elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    else nextInPort <= SOUTH;
-                    end if;
-                when WEST =>
-                    if routingReq(NORTH) = '1'      then nextInPort <= NORTH;
-                    elsif routingReq(UP) = '1'      then nextInPort <= UP;
-                    elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    else nextInPort <= WEST;
-                    end if;
-                when NORTH =>
-                    if routingReq(UP) = '1'         then nextInPort <= UP;
-                    elsif routingReq(DOWN) = '1'    then nextInPort <= DOWN;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    else nextInPort <= NORTH;
-                    end if;
-                when UP =>
-                    if routingReq(DOWN) = '1'       then nextInPort <= DOWN;
-                    elsif routingReq(LOCAL) = '1'   then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    else nextInPort <= UP;
-                    end if;
-                when DOWN =>
-                    if routingReq(LOCAL) = '1'      then nextInPort <= LOCAL;
-                    elsif routingReq(EAST) = '1'    then nextInPort <= EAST;
-                    elsif routingReq(SOUTH) = '1'   then nextInPort <= SOUTH;
-                    elsif routingReq(WEST) = '1'    then nextInPort <= WEST;
-                    elsif routingReq(NORTH) = '1'   then nextInPort <= NORTH;
-                    elsif routingReq(UP) = '1'      then nextInPort <= UP;
-                    else nextInPort <= DOWN;
-                    end if;
-                when others =>
-                    nextInPort <= LOCAL;
-            end case;
-            
-            -- RR: for i in 0 to PORTS-1 generate
-                -- if (routingReq(((selectedInPort+i rem 6)+1)-(selectedInPort/6)) = '1') then
-                    -- nextInPort <= ((selectedInPort+i rem 6)+1)-(selectedInPort/6);
-                -- else
-                    -- nextInPort <= selectedInPort;
-                -- end if;
-            -- end generate;
-            
-         end process;
-
+        
+         req <= ('0' & routingReq);
+        
         -- Routing
         routedOutPort <= XYZ(data(nextInPort),address);
         
     end generate;
     
-    
+    lowerPriority <= STD_LOGIC_VECTOR(TO_UNSIGNED(selectedInPort,3));
+
+    UUTT: entity work.ProgramablePriorityEncoder
+        port map(
+            request => req,
+            lowerPriority => lowerPriority,
+            code => code,
+            newRequest => newRequest
+        );
+        
+    nextInPort <= TO_INTEGER(UNSIGNED(code));
     
     ------------------------------
     -- Routing table management --
@@ -203,18 +100,18 @@ begin
                     -- Updates the routing table.
                     -- Frees the output ports released by the input ones 
                     for i in 0 to PORTS-1 loop
-                        if sending(i) = '0' and TO_INTEGER(UNSIGNED(routingTable(i))) < PORTS then
-                            routingTable(i) <= (others=>'1');
-                            freePorts(TO_INTEGER(UNSIGNED(routingTable(i)))) <= '0';
+                        if sending(i) = '0' and routingTable(i) /= NOT_ROUTED then
+                            routingTable(i) <= NOT_ROUTED;
+                            freePorts(TO_INTEGER(UNSIGNED(routingTable(i)))) <= FREE;
                         end if;
                     end loop;   
                     
                     -- Wait for a port request.
                     -- Sets the routing table if the routed output port is available
-                    if SIGNED(routingReq) /= 0 and freePorts(routedOutPort) = '0' then
+                    if newRequest = '1' and freePorts(routedOutPort) = FREE then
                         routingTable(nextInPort) <= STD_LOGIC_VECTOR(TO_UNSIGNED(routedOutPort,3));
                         routingAck(nextInPort) <= '1';
-                        freePorts(routedOutPort) <= '1'; -- 1 means that the port is busy.
+                        freePorts(routedOutPort) <= BUSY;
                         currentState <= ROUTING_ACK;
                     else
                         currentState <= IDLE;
