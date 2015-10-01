@@ -9,7 +9,6 @@ if { ![file exist work] } {
 # Source files listed in hierarchical order: bottom -> top
 set sourceFiles {
     ../NoC_Package.vhd
-    ../ProgramablePriorityEncoder.vhd
     ../InputBuffer.vhd
     ../SwitchControl.vhd
     ../Crossbar.vhd

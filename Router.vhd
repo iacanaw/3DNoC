@@ -3,10 +3,9 @@
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 8th, 2015                                                     --
--- VERSION      : 0.2.2                                                             --
+-- VERSION      : 0.1                                                               --
 -- HISTORY      : Version 0.1 - Apr 8th, 2015                                       --
 --              : Version 0.2 - Jul 9th, 2015                                       --
---              : Version 0.2.1 - Set 18th, 2015                                    --
 --------------------------------------------------------------------------------------
 
 library ieee;
@@ -28,8 +27,8 @@ generic(address: std_logic_vector(DATA_WIDTH-1 downto 0));
 end Router;
 
 architecture Router of Router is
-    signal routingTable         : Array1D_3bits(0 to PORTS-1);
-    signal crossbarDataIn       : Array1D_data(0 to PORTS-1);
+    signal routingTable         : Array1D_ports(0 to PORTS-1);
+    signal crossbarDataIn       :Array1D_data(0 to PORTS-1);
     signal crossbarControlIn    : Array1D_control(0 to PORTS-1);
     signal routingRequest       : std_logic_vector(PORTS-1 downto 0);
     signal routingAck           : std_logic_vector(PORTS-1 downto 0);

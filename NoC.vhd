@@ -3,11 +3,10 @@
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 12th, 2015                                                    --
--- VERSION      : 0.2.2                                                             --
+-- VERSION      : 0.1                                                               --
 -- HISTORY      : Version 0.1 - Apr 12th, 2015                                      --
 --              : Version 0.2 - May 17th, 2015 - Adição do loop para geração da NoC --
 -- bidimensional                                                                    --
---              : Version 0.2.1 - Set 18th, 2015                                    --
 --------------------------------------------------------------------------------------
 
 library ieee;
@@ -35,10 +34,10 @@ architecture structural of NoC is
         port(
             clk            : in std_logic;
             rst            : in std_logic;
-            data_in        : in Array1D_data(0 to PORTS-1);
-            control_in     : in Array1D_control(0 to PORTS-1);
-            data_out       : out Array1D_data(0 to PORTS-1);
-            control_out    : out Array1D_control(0 to PORTS-1)
+            data_in        : in Array1D_data(0 to 6);
+            control_in     : in Array1D_control(0 to 6);
+            data_out       : out Array1D_data(0 to 6);
+            control_out    : out Array1D_control(0 to 6)
         );
     end component;
     
@@ -78,21 +77,29 @@ begin
                             data_in(SOUTH)      => data(x,y-1,z,NORTH),
                             data_in(WEST)       => data(x-1,y,z,EAST),
                             data_in(NORTH)      => data(x,y+1,z,SOUTH),
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control(x+1,y,z,WEST),
                             control_in(SOUTH)   => control(x,y-1,z,NORTH),
                             control_in(WEST)    => control(x-1,y,z,EAST),
                             control_in(NORTH)   => control(x,y+1,z,SOUTH),
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate CENTRAL_ROUTER;
                     
@@ -107,21 +114,29 @@ begin
                             data_in(SOUTH)      => data_dump,
                             data_in(WEST)       => data_dump,
                             data_in(NORTH)      => data(x,y+1,z,SOUTH),
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control(x+1,y,z,WEST),
                             control_in(SOUTH)   => control_dump,
                             control_in(WEST)    => control_dump,
                             control_in(NORTH)   => control(x,y+1,z,SOUTH),
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate BOTTON_LEFT_CORNER;
                     
@@ -136,21 +151,29 @@ begin
                             data_in(SOUTH)      => data_dump,
                             data_in(WEST)       => data(x-1,y,z,EAST),
                             data_in(NORTH)      => data(x,y+1,z,SOUTH),
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control_dump,
                             control_in(SOUTH)   => control_dump,
                             control_in(WEST)    => control(x-1,y,z,EAST),
                             control_in(NORTH)   => control(x,y+1,z,SOUTH),
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate BOTTON_RIGHT_CORNER;
                     
@@ -165,21 +188,29 @@ begin
                             data_in(SOUTH)      => data(x,y-1,z,NORTH),
                             data_in(WEST)       => data_dump,
                             data_in(NORTH)      => data_dump,
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control(x+1,y,z,WEST),
                             control_in(SOUTH)   => control(x,y-1,z,NORTH),
                             control_in(WEST)    => control_dump,
                             control_in(NORTH)   => control_dump,
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate TOP_LEFT_CORNER;
                     
@@ -194,21 +225,29 @@ begin
                             data_in(SOUTH)      => data(x,y-1,z,NORTH),
                             data_in(WEST)       => data(x-1,y,z,EAST),
                             data_in(NORTH)      => data_dump,
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control_dump,
                             control_in(SOUTH)   => control(x,y-1,z,NORTH),
                             control_in(WEST)    => control(x-1,y,z,EAST),
                             control_in(NORTH)   => control_dump,
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate TOP_RIGHT_CORNER;
                     
@@ -223,21 +262,29 @@ begin
                             data_in(SOUTH)      => data_dump,
                             data_in(WEST)       => data(x-1,y,z,EAST),
                             data_in(NORTH)      => data(x,y+1,z,SOUTH),
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control(x+1,y,z,WEST),
                             control_in(SOUTH)   => control_dump,
                             control_in(WEST)    => control(x-1,y,z,EAST),
                             control_in(NORTH)   => control(x,y+1,z,SOUTH),
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate BOTTON_BORDER;
                     
@@ -252,21 +299,29 @@ begin
                             data_in(SOUTH)      => data(x,y-1,z,NORTH),
                             data_in(WEST)       => data_dump,
                             data_in(NORTH)      => data(x,y+1,z,SOUTH),
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control(x+1,y,z,WEST),
                             control_in(SOUTH)   => control(x,y-1,z,NORTH),
                             control_in(WEST)    => control_dump,
                             control_in(NORTH)   => control(x,y+1,z,SOUTH),
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate LEFT_BORDER;
                     
@@ -281,21 +336,29 @@ begin
                             data_in(SOUTH)      => data(x,y-1,z,NORTH),
                             data_in(WEST)       => data(x-1,y,z,EAST),
                             data_in(NORTH)      => data_dump,
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control(x+1,y,z,WEST),
                             control_in(SOUTH)   => control(x,y-1,z,NORTH),
                             control_in(WEST)    => control(x-1,y,z,EAST),
                             control_in(NORTH)   => control_dump,
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate TOP_BORDER;
                     
@@ -310,21 +373,29 @@ begin
                             data_in(SOUTH)      => data(x,y-1,z,NORTH),
                             data_in(WEST)       => data(x-1,y,z,EAST),
                             data_in(NORTH)      => data(x,y+1,z,SOUTH),
+                            data_in(UP)         => data_dump,
+                            data_in(DOWN)       => data_dump,
                             control_in(LOCAL)   => control_in(x,y,z),
                             control_in(EAST)    => control_dump,
                             control_in(SOUTH)   => control(x,y-1,z,NORTH),
                             control_in(WEST)    => control(x-1,y,z,EAST),
                             control_in(NORTH)   => control(x,y+1,z,SOUTH),
+                            control_in(UP)      => control_dump,
+                            control_in(DOWN)    => control_dump,
                             data_out(LOCAL)     => data_out(x,y,z),
                             data_out(EAST)      => data(x,y,z,EAST),
                             data_out(SOUTH)     => data(x,y,z,SOUTH),
                             data_out(WEST)      => data(x,y,z,WEST),
                             data_out(NORTH)     => data(x,y,z,NORTH),
+                            data_out(UP)        => data(x,y,z,UP),
+                            data_out(DOWN)      => data(x,y,z,DOWN),
                             control_out(LOCAL)  => control_out(x,y,z),
                             control_out(EAST)   => control(x,y,z,EAST),
                             control_out(SOUTH)  => control(x,y,z,SOUTH),
                             control_out(WEST)   => control(x,y,z,WEST),
-                            control_out(NORTH)  => control(x,y,z,NORTH)
+                            control_out(NORTH)  => control(x,y,z,NORTH),
+                            control_out(UP)     => control(x,y,z,UP),
+                            control_out(DOWN)   => control(x,y,z,DOWN)
                         );
                     end generate RIGHT_BORDER;
 

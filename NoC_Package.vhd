@@ -3,9 +3,8 @@
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 8th, 2015                                                     --
--- VERSION      : 0.2.2                                                             --
+-- VERSION      : 0.1                                                               --
 -- HISTORY      : Version 0.1 - Apr 8th, 2015                                       --
---              : Version 0.2.1 - Set 18th, 2015                                    --
 --------------------------------------------------------------------------------------
 
 library ieee;
@@ -13,7 +12,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 package NoC_Package is
-    
+	
     ---------------
     -- Constants --
     ---------------
@@ -23,9 +22,6 @@ package NoC_Package is
     constant DIM_X    : integer := 3;
     constant DIM_Y    : integer := 3;
     constant DIM_Z    : integer := 3;
-    -- Number of router ports
-    -- Must be 5 for 2D mesh and 7 for 3D mesh
-    constant PORTS      : integer := 7;
     
     -- Data and control buses 
     constant DATA_WIDTH     : integer := 16;
@@ -36,6 +32,9 @@ package NoC_Package is
     constant RX         : integer := 1;
     constant TX         : integer := 1;
     constant STALL_GO   : integer := 2;
+
+    -- Number of router ports
+    constant PORTS      : integer := 7;
     
     -- Router ports identification
     constant LOCAL      : integer := 0;
@@ -49,10 +48,6 @@ package NoC_Package is
     -- Input buffers depth
     constant BUFFER_DEPTH : integer := 8; -- Buffer depth must be greater than 1 and a power of 2
     
-    constant NOT_ROUTED : std_logic_vector(2 downto 0) := "111";
-    constant FREE       : std_logic := '0';
-    constant BUSY       : std_logic := '1';
-    
     -----------------
     -- Array types --
     -----------------
@@ -62,7 +57,6 @@ package NoC_Package is
     type Array1D_data is array (natural range <>) of std_logic_vector(DATA_WIDTH-1 downto 0);
     type Array1D_control is array (natural range <>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
     type Array1D_ports is array (natural range<>) of std_logic_vector(PORTS-1 downto 0);
-    type Array1D_3bits is array (natural range<>) of std_logic_vector(2 downto 0);
     
     -- Types used at NoC interface. 
     -- In case of 3D NoCs, each element (x,y,z) indicates a router local port. 
@@ -72,18 +66,15 @@ package NoC_Package is
     
     -- Types used to interconnect routers when generating a NoC instance (NoC.vhd).
     type Array4D_data is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(DATA_WIDTH-1 downto 0);
-    type Array4D_control is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
+    type array4D_control is array (natural range <>, natural range <>, natural range <>, natural range<>) of std_logic_vector(CONTROL_WIDTH-1 downto 0);
 
-    
-    
     -- Buffer to store flits instantiated at port (InputBuffer.vhd)
     type DataBuff is array(0 to BUFFER_DEPTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
     
     function Log2(temp : natural) return natural;
     function Address(x,y,z : natural) return std_logic_vector;
     function XYZ(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer;
-    function XY(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer;
-    
+	
 end package;
 
 package body NoC_Package is
@@ -109,11 +100,11 @@ package body NoC_Package is
     --      +--------+-----------+-----------+-----------+
     --      | 00...0 |  X_FIELD  |  Y_FIELD  |  Z_FIELD  |
     --      +--------+-----------+-----------+-----------+
-    -- 
-    constant X_FIELD    : integer := Log2(DIM_X);
-    constant Y_FIELD    : integer := Log2(DIM_Y);
-    constant Z_FIELD    : integer := Log2(DIM_Z);
-    --
+	-- 
+	constant X_FIELD	: integer := Log2(DIM_X);
+	constant Y_FIELD	: integer := Log2(DIM_Y);
+	constant Z_FIELD	: integer := Log2(DIM_Z);
+	--
     function Address(x,y,z : natural) return std_logic_vector is
         variable address : std_logic_vector(DATA_WIDTH-1 downto 0);
         variable binX : std_logic_vector(X_FIELD-1 downto 0);
@@ -180,38 +171,5 @@ package body NoC_Package is
         return outputPort;
         
     end XYZ;
-    
-    -- Function returns the port that should be used to send the packet according the XYZ algorithm.
-    function XY(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer is
-        -- Routed output port
-        variable outputPort : integer range 0 to PORTS-1;
-        
-        -- Current router address
-        variable currentX   : std_logic_vector(X_FIELD-1 downto 0) := current(Y_FIELD+X_FIELD-1 downto Y_FIELD);
-        variable currentY   : std_logic_vector(Y_FIELD-1 downto 0) := current(Y_FIELD-1 downto 0);
-        
-        -- Target router address
-        variable targetX    : std_logic_vector(X_FIELD-1 downto 0) := target(Y_FIELD+X_FIELD-1 downto Y_FIELD);
-        variable targetY    : std_logic_vector(Y_FIELD-1 downto 0) := target(Y_FIELD-1 downto 0);
-    begin
-        if(currentX = targetX) then
-        
-            if(currentY = targetY) then            
-                outputPort := LOCAL;
-            elsif (currentY < targetY) then
-                outputPort := NORTH;
-            else --currentY > targetY
-                outputPort := SOUTH;
-            end if;
-            
-        elsif (currentX < targetX) then
-            outputPort := EAST;
-        else --currentX > targetX
-            outputPort := WEST;
-        end if;
-        
-        return outputPort;
-        
-    end XY;
 
 end NoC_Package;
