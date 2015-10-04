@@ -3,7 +3,7 @@
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 12th, 2015                                                    --
--- VERSION      : 0.2.2                                                             --
+-- VERSION      : 0.2.3                                                             --
 -- HISTORY      : Version 0.1 - Apr 12th, 2015                                      --
 --              : Version 0.2 - May 17th, 2015 - Adição do loop para geração da NoC --
 -- bidimensional                                                                    --

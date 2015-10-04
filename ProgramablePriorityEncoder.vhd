@@ -3,7 +3,7 @@
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 8th, 2015                                                     --
--- VERSION      : 0.1                                                               --
+-- VERSION      : 0.2.3                                                             --
 -- HISTORY      : Version 0.1 - Jun 16th, 2015                                      --
 --------------------------------------------------------------------------------------
 library IEEE;
