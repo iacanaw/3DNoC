@@ -113,7 +113,7 @@ package body NoC_Package is
     constant X_FIELD    : integer := Log2(DIM_X);
     constant Y_FIELD    : integer := Log2(DIM_Y);
     constant Z_FIELD    : integer := Log2(DIM_Z);
-    --
+    
     function Address(x,y,z : natural) return std_logic_vector is
         variable address : std_logic_vector(DATA_WIDTH-1 downto 0);
         variable binX : std_logic_vector(X_FIELD-1 downto 0);
@@ -138,7 +138,7 @@ package body NoC_Package is
         return address;
     end function Address;
     
-    -- Function returns the port that should be used to send the packet according the XYZ algorithm.
+    --Function returns the port that should be used to send the packet according the XYZ algorithm.
     function XYZ(target,current: std_logic_vector(DATA_WIDTH-1 downto 0)) return integer is
         -- Routed output port
         variable outputPort : integer range 0 to PORTS-1;

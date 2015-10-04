@@ -15,7 +15,7 @@ use ieee.numeric_std.all;
 
 entity SwitchControl is
     generic(
-        address : std_logic_vector(DATA_WIDTH-1 downto 0)     := x"0000"    
+        address : std_logic_vector(DATA_WIDTH-1 downto 0) := x"0015"
     );
     port(
         clk         :    in    std_logic;
@@ -23,7 +23,7 @@ entity SwitchControl is
         
         routingReq  :    in  std_logic_vector(PORTS-1 downto 0);    -- Routing request from input buffers
         routingAck  :    out std_logic_vector(PORTS-1 downto 0);    -- Routing acknowledgement to input buffers
-        data        :    in  Array1D_data(0 to PORTS-1);    -- Each array element corresponds to a input buffer data_out
+        data        :    in  Array1D_data(0 to PORTS-1);     -- Each array element corresponds to a input buffer data_out
         sending     :    in  std_logic_vector(PORTS-1 downto 0);  -- Each array element signals an input buffer transmiting data
         table       :    out Array1D_3bits(0 to PORTS-1)    -- Routing table to be connected to crossbar
     );
@@ -69,7 +69,7 @@ begin
     
     lowerPriority <= STD_LOGIC_VECTOR(TO_UNSIGNED(selectedInPort,3));
 
-    UUTT: entity work.ProgramablePriorityEncoder
+    PPE: entity work.ProgramablePriorityEncoder
         port map(
             request => req,
             lowerPriority => lowerPriority,
@@ -86,8 +86,8 @@ begin
     begin
         if rst = '1' then
             routingAck <= (others=>'0');                  
-            routingTable <= (others=>(others=>'1'));
-            freePorts <= (others=>'0');
+            routingTable <= (others=>NOT_ROUTED);
+            freePorts <= (others=>FREE);
             currentState <= IDLE;
             
         elsif rising_edge(clk) then

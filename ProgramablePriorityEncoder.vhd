@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------
--- DESIGN UNIT  : Dynamic Priority Encoder                                                    --
+-- DESIGN UNIT  : Dynamic Priority Encoder                                          --
 -- DESCRIPTION  :                                                                   --
 -- AUTHOR       : Everton Alceu Carara, Iaçanã Ianiski Weber & Michel Duarte        --
 -- CREATED      : Apr 8th, 2015                                                     --

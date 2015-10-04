@@ -14,7 +14,7 @@ use ieee.std_logic_1164.all;
 use work.NoC_Package.all;
 
 entity Router is
-generic(address: std_logic_vector(DATA_WIDTH-1 downto 0));
+generic(address: std_logic_vector(DATA_WIDTH-1 downto 0) := x"0015");
     port(
         clk           : in std_logic;
         rst           : in std_logic;
