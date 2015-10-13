@@ -45,7 +45,7 @@ architecture behavioral of SwitchControl is
     signal newRequest: std_logic;
     
 begin
-      
+    
     -- Set the priority encoder input request and routing algorithm for 2D NoCs 
     NoC2D : if(DIM_X>1 and DIM_Y>1 and DIM_Z=1) generate
         
@@ -87,10 +87,10 @@ begin
     process(clk, rst)
     begin
         if rst = '1' then
-            routingAck <= (others=>'0');                  
-            routingTable <= (others=>NOT_ROUTED);
-            freePorts <= (others=>FREE);
-            currentState <= IDLE;
+            routingAck      <= (others=>'0');                  
+            routingTable    <= (others=>NOT_ROUTED);
+            freePorts       <= (others=>FREE);
+            currentState    <= IDLE;
             
         elsif rising_edge(clk) then
             case currentState is

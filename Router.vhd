@@ -67,7 +67,7 @@ SWITCH_CONTROL: entity work.SwitchControl
 -- Buffers instantiation with for ... generate
 --------------------------------------------------------------------------------------
     PortBuffers: for n in 0 to PORTS-1 generate
-        BufferN: entity work.InputBuffer 
+        BufferN: entity work.InputBuffer(routingRequest_reg) 
         port map(
             clk                     => clk,
             rst                     => rst,
