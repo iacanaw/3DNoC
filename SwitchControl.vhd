@@ -25,7 +25,7 @@ entity SwitchControl is
         routingAck  :    out std_logic_vector(PORTS-1 downto 0);    -- Routing acknowledgement to input buffers
         data        :    in  Array1D_data(0 to PORTS-1);     -- Each array element corresponds to a input buffer data_out
         sending     :    in  std_logic_vector(PORTS-1 downto 0);  -- Each array element signals an input buffer transmiting data
-        table       :    out Array1D_3bits(0 to PORTS-1)    -- Routing table to be connected to crossbar
+        table       :    out Array1D_3bits(0 to PORTS-1)    -- Routing table to be connected to crossbar. Each array element encodes a direction.
     );
 end SwitchControl;
 
@@ -46,35 +46,37 @@ architecture behavioral of SwitchControl is
     
 begin
     
-    -------------------------------------------------------------
-    -- Round robin policy to chose the input port to be served --
-    -------------------------------------------------------------
+    -- Set the priority encoder input request and routing algorithm for 2D NoCs 
     NoC2D : if(DIM_X>1 and DIM_Y>1 and DIM_Z=1) generate
         
         req <= ("000" & routingReq);
         
-        -- Routing
+        -- Routing (XY algorithm)
         routedOutPort <= XY(data(nextInPort),address);
         
     end generate;
     
+    -- Set the priority encoder input request and routing algorithm for 3D NoCs 
     NoC3D : if(DIM_X>1 and DIM_Y>1 and DIM_Z>1) generate
         
          req <= ('0' & routingReq);
         
-        -- Routing
+        -- Routing (XYZ algorithm)
         routedOutPort <= XYZ(data(nextInPort),address);
         
     end generate;
     
     lowerPriority <= STD_LOGIC_VECTOR(TO_UNSIGNED(selectedInPort,3));
 
+    -------------------------------------------------------------
+    -- Round robin policy to chose the input port to be served --
+    -------------------------------------------------------------
     PPE: entity work.ProgramablePriorityEncoder
         port map(
-            request => req,
-            lowerPriority => lowerPriority,
-            code => code,
-            newRequest => newRequest
+            request         => req,
+            lowerPriority   => lowerPriority,
+            code            => code,
+            newRequest      => newRequest
         );
         
     nextInPort <= TO_INTEGER(UNSIGNED(code));
@@ -85,10 +87,10 @@ begin
     process(clk, rst)
     begin
         if rst = '1' then
-            routingAck <= (others=>'0');                  
-            routingTable <= (others=>NOT_ROUTED);
-            freePorts <= (others=>FREE);
-            currentState <= IDLE;
+            routingAck      <= (others=>'0');                  
+            routingTable    <= (others=>NOT_ROUTED);
+            freePorts       <= (others=>FREE);
+            currentState    <= IDLE;
             
         elsif rising_edge(clk) then
             case currentState is
