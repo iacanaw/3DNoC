@@ -17,19 +17,26 @@ package NoC_Package is
     ---------------
     -- Constants --
     ---------------
+                                        ---------------------
+                                        -- Parameterizable --
+                                        ---------------------
     
     -- Dimension X and Y need to be greater than 1, for 2D NoCs use Z = 1
     -- X grows from left to right, Y grows from front to back, Z grows from bottom to top
     constant DIM_X    : integer := 3;
     constant DIM_Y    : integer := 3;
     constant DIM_Z    : integer := 3;
-    -- Number of router ports
-    -- Must be 5 for 2D mesh and 7 for 3D mesh
-    constant PORTS      : integer := 7;
+    
+    -- Input buffers depth 
+    constant BUFFER_DEPTH : integer := 8; -- Buffer depth must be greater than 1 and a power of 2
     
     -- Data and control buses 
-    constant DATA_WIDTH     : integer := 16;
-    constant CONTROL_WIDTH  : integer := 3;
+    constant DATA_WIDTH     : integer := 16;                                                            
+    constant CONTROL_WIDTH  : integer := 3;  
+
+                                      -------------------------
+                                      -- Not parameterizable --
+                                      -------------------------
     
     -- Control signals identification
     constant EOP        : integer := 0;
@@ -46,9 +53,11 @@ package NoC_Package is
     constant UP         : integer := 5;
     constant DOWN       : integer := 6;
     
-    -- Input buffers depth
-    constant BUFFER_DEPTH : integer := 8; -- Buffer depth must be greater than 1 and a power of 2
-    
+    -- Number of router ports
+    -- The function returns 5 to 2D mesh and 7 for 3D mesh
+    constant PORTS      : integer := (7 - 2*(1/DIM_Z));
+        
+    -- 
     constant NOT_ROUTED : std_logic_vector(2 downto 0) := "111";
     constant FREE       : std_logic := '0';
     constant BUSY       : std_logic := '1';
